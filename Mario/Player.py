@@ -32,7 +32,7 @@ class Player(object):
         
         self.pos_x = x_pos
 
-        self.image = pg.image.load('Next/images/Mario/mario.png').convert_alpha()
+        self.image = pg.image.load('Assets/images/Mario/mario.png').convert_alpha()
         self.sprites = []
         self.load_sprites()
 
@@ -42,28 +42,28 @@ class Player(object):
         self.sprites = [
             # 0 Small, stay
             # 0 Small, stay
-            pg.image.load('Next/images/Mario/mario.png'),
+            pg.image.load('Assets/images/Mario/mario.png'),
 
             # 1 Small, move 0
-            pg.image.load('Next/images/Mario/mario_move0.png'),
+            pg.image.load('Assets/images/Mario/mario_move0.png'),
 
             # 2 Small, move 1
-            pg.image.load('Next/images/Mario/mario_move1.png'),
+            pg.image.load('Assets/images/Mario/mario_move1.png'),
 
             # 3 Small, move 2
-            pg.image.load('Next/images/Mario/mario_move2.png'),
+            pg.image.load('Assets/images/Mario/mario_move2.png'),
 
             # 4 Small, jump
-            pg.image.load('Next/images/Mario/mario_jump.png'),
+            pg.image.load('Assets/images/Mario/mario_jump.png'),
 
             # 5 Small, end 0
-            pg.image.load('Next/images/Mario/mario_end.png'),
+            pg.image.load('Assets/images/Mario/mario_end.png'),
 
             # 6 Small, end 1
-            pg.image.load('Next/images/Mario/mario_end1.png'),
+            pg.image.load('Assets/images/Mario/mario_end1.png'),
 
             # 7 Small, stop
-            pg.image.load('Next/images/Mario/mario_st.png')]
+            pg.image.load('Assets/images/Mario/mario_st.png')]
 
 
 

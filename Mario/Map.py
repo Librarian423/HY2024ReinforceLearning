@@ -58,7 +58,7 @@ class Map(object):
         self.oPlayer = Player(x_pos=128, y_pos=351)
 
     def loadWorld_11(self):
-        tmx_data = load_pygame("Next/worlds/tmx/W11.tmx")
+        tmx_data = load_pygame("Assets/worlds/tmx/W11.tmx")
         self.mapSize = (tmx_data.width, tmx_data.height)
 
         self.sky = pg.Surface((WINDOW_W, WINDOW_H))
