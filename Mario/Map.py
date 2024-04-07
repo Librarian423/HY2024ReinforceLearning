@@ -152,7 +152,7 @@ class Map(object):
 
     def set_block_shake(self, x, y):
         if self.map[x][y] != 0 and self.map[x][y].type != 'BGObject':
-            if (self.map[x][y]).get_id() == 22:
+            if (self.map[x][y]).get_id() == 22 or 23:
                 self.map[x][y].set_shake_true()
 
 
