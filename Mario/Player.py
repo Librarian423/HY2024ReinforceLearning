@@ -1,5 +1,4 @@
 import pygame as pg
-
 from Const import *
 
 
@@ -31,6 +30,7 @@ class Player(object):
         self.fast_moving = False
         
         self.pos_x = x_pos
+        self.pos_y = y_pos
 
         self.image = pg.image.load('Assets/images/Mario/mario.png').convert_alpha()
         self.sprites = []
@@ -206,6 +206,8 @@ class Player(object):
         for block in blocks:
             if block != 0 and block.type != 'BGObject':
                 if pg.Rect.colliderect(self.rect, block.rect):
+                    #check
+                    self.check_upper_block(self.rect,core)
 
                     if self.y_vel > 0:
                         self.on_ground = True
@@ -217,7 +219,33 @@ class Player(object):
                         self.y_vel = -self.y_vel / 3
         
 
+    def check_upper_block(self, character, core):
 
+        x_temp = character.x // 32
+        #x_temp = int(tc.clamp(x_temp, min=x_temp-0.5, max=x_temp+0.5))
+        y_temp = character.y // 32
+        print(x_temp, y_temp)
+        print("block id",core.get_map().get_block_id(x_temp, y_temp))
+        if core.get_map().get_block_id(x_temp, y_temp) == 22:
+            core.get_map().set_block_shake(x_temp, y_temp)
+            print("hit")
+        # elif core.get_map().get_block_id(x_temp+1, y_temp) == 22:
+        #     core.get_map().set_block_shake(x_temp+1, y_temp)
+        #     print("hit")
+        # elif core.get_map().get_block_id(x_temp-1, y_temp) == 22:
+        #     core.get_map().set_block_shake(x_temp-1, y_temp)
+        #     print("hit")
+
+        if core.get_map().get_block_id(x_temp, y_temp) == 23:
+            print("shake")
+            core.get_map().set_block_shake(x_temp, y_temp)
+            print("hit")
+        # elif core.get_map().get_block_id(x_temp+1, y_temp) == 23:
+        #     core.get_map().set_block_shake(x_temp+1, y_temp)
+        #     print("hit")
+        # elif core.get_map().get_block_id(x_temp-1, y_temp) == 23:
+        #     core.get_map().set_block_shake(x_temp-1, y_temp)
+        #     print("hit")
 
 
 
