@@ -17,7 +17,14 @@ class Platform(object):
         self.shakingUp = True
         self.shakeOffset = 0
 
+        #?block
         if self.typeID == 22:
+            self.currentImage = 0
+            self.imageTick = 0
+            self.isActivated = False
+            self.bonus = 'coin'
+        #block
+        if self.typeID == 23:
             self.currentImage = 0
             self.imageTick = 0
             self.isActivated = False
@@ -53,8 +60,15 @@ class Platform(object):
         return (self.typeID)
 
     def set_shake_true(self):
-        print("true")
         self.shaking = True
+        self.set_isActivated()
+
+
+    def set_isActivated(self):
+        self.isActivated = True
+
+    def change_block_image(self):
+        pass
 
     def render(self, core):
         # Question block
