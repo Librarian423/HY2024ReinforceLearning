@@ -49,6 +49,12 @@ class Platform(object):
             self.shaking = False
             self.shakingUp = True
 
+    def get_id(self):
+        return (self.typeID)
+
+    def set_shake_true(self):
+        print("true")
+        self.shaking = True
 
     def render(self, core):
         # Question block
