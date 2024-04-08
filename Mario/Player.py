@@ -32,7 +32,6 @@ class Player(object):
         
         self.pos_x = x_pos
 
-        self.image = pg.image.load('Assets/images/Mario/mario.png').convert_alpha()
         self.sprites = []
         self.load_sprites()
 
@@ -87,7 +86,7 @@ class Player(object):
             self.x_vel -= SPEED_INCREASE_RATE
             self.direction = False
         if not core.keyU:
-            self.already_jumped = False
+            self.already_jumped = False # why?
         elif core.keyU:
             if self.on_ground and not self.already_jumped:
                 self.y_vel = -JUMP_POWER
@@ -131,7 +130,7 @@ class Player(object):
         if 0 < self.x_vel < SPEED_DECREASE_RATE:
             self.x_vel = 0
         
-        if 0 > self.x_vel >  -SPEED_DECREASE_RATE:
+        if 0 > self.x_vel > -SPEED_DECREASE_RATE:
             self.x_vel = 0
 
 
@@ -157,8 +156,7 @@ class Player(object):
         
 
 
-        blocks = core.get_map().get_blocks_for_collision(self.rect.x // 32, 
-                                                        self.rect.y // 32)
+        blocks = core.get_map().get_blocks_for_collision(self.rect.x // 32, self.rect.y // 32)
 
         self.pos_x += self.x_vel
         self.rect.x = self.pos_x
@@ -180,14 +178,21 @@ class Player(object):
         for block in core.get_map().get_blocks_below(self.rect.x // 32, coord_y):
             if block != 0 and block.type != 'BGObject':
                 
-                if pg.Rect(self.rect.x, self.rect.y + 1, self.rect.w, self.rect.h) \
-                .colliderect(block.rect):
+                if pg.Rect(self.rect.x, self.rect.y + 1, self.rect.w, self.rect.h).colliderect(block.rect):
                     
                     self.on_ground = True
 
 
 
     def update_x_pos(self, blocks):
+
+        if self.rect.left < 0:
+            self.rect.left = 0
+            self.pos_x = self.rect.left
+            self.x_vel = 0
+        elif self.rect.right > WINDOW_H:
+            pass
+
         for block in blocks:
             if block != 0 and block.type != 'BGObject':
                 block.debugLight = True
@@ -202,6 +207,12 @@ class Player(object):
                         self.x_vel = 0
 
     def update_y_pos(self, blocks, core):
+        if self.rect.bottom > WINDOW_H:
+            self.rect.bottom = WINDOW_H
+            self.y_vel = 0
+            self.on_ground = True
+            return
+            # die
         self.on_ground = False
         for block in blocks:
             if block != 0 and block.type != 'BGObject':
@@ -215,8 +226,10 @@ class Player(object):
                     elif self.y_vel < 0:
                         self.rect.top = block.rect.bottom
                         self.y_vel = -self.y_vel / 3
+                        self.activate_block_action(core, block)
         
-
+    def activate_block_action(self, core, block):
+        pass
 
 
 

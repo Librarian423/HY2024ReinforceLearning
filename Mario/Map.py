@@ -10,6 +10,7 @@ from Platform import Platform
 
 from Camera import Camera
 from Player import Player
+from Mob import Mob
 
 from Tube import Tube
 
@@ -83,7 +84,7 @@ class Map(object):
 
                         if layer.name == 'Foreground':
 
-                            # 22 ID is a question block, so in taht case we shoud load all it's images
+                            # 22 ID is a question block, so in that case we should load all it's images
                             if tileID == 22:
                                 image = (
                                     image,                                      # 1
@@ -108,6 +109,9 @@ class Map(object):
         self.spawn_tube(55, 8)
         self.spawn_tube(163, 10)
         self.spawn_tube(179, 10)
+        self.spawn_mob(0, 351, 'goombas')
+        self.spawn_mob(188, 351, 'goombas')
+
 
 
     def get_player(self):
@@ -123,6 +127,11 @@ class Map(object):
         for y in range(y_coord, 12): #12 is because it ground level
             for x in range(x_coord, x_coord + 2):
                 self.map[x][y] = Platform(x*32, y*32, image = None, type_id= 0)
+
+    def spawn_mob(self, x_pos, y_pos, name):
+        index = len(self.mobs)
+        self.mobs.append(Mob(x_pos, y_pos, name, index))
+        # self.is_mob_spawned[0] = True
             
 
 
@@ -163,7 +172,9 @@ class Map(object):
     def update_player(self, core):
         self.get_player().update(core)
 
-   
+    def update_mobs(self, core):
+        for mob in self.mobs:
+            mob.update(core)
 
 
     def update(self, core):
@@ -171,6 +182,7 @@ class Map(object):
         
         if not core.get_map().in_event:
             self.update_player(core)
+            self.update_mobs(core)
 
         else:
             self.get_event().update(core)
@@ -207,14 +219,17 @@ class Map(object):
         for obj in self.obj_bg:
             obj.render(core) #clouds and so on
 
-
         for tube in self.tubes:
             tube.render(core)
 
         for obj in self.obj:
             obj.render(core) #bricks
 
+        for mob in self.mobs:
+            mob.render(core)
+
         self.get_player().render(core) #player
+
 
      
 
