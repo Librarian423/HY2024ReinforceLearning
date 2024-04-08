@@ -36,6 +36,8 @@ class Player(object):
         self.load_sprites()
 
         self.rect = pg.Rect(x_pos, y_pos, 32, 32)
+        self.groundRect = pg.Rect(x_pos, y_pos+31, 20, 5)
+
 
     def load_sprites(self):
         self.sprites = [
@@ -120,9 +122,11 @@ class Player(object):
         # write a code for solving computational error
         if 0 < self.x_vel < SPEED_DECREASE_RATE:
             self.x_vel = 0
+            self.groundRect.x = self.pos_x
 
         if 0 > self.x_vel > -SPEED_DECREASE_RATE:
             self.x_vel = 0
+            self.groundRect.x = self.pos_x
 
         # introduce a proper movement of leg of mario
         # moving Up i/e. JUMP action for MARIO
@@ -145,6 +149,7 @@ class Player(object):
 
         self.pos_x += self.x_vel
         self.rect.x = self.pos_x
+        self.groundRect.x = self.pos_x
 
         # this function allows to stop when player collides with bricks
         self.update_x_pos(blocks)
@@ -294,6 +299,7 @@ class Player(object):
     def render(self, core):
         if self.visible:
             core.screen.blit(self.image, core.get_map().get_Camera().apply(self))
+        pg.draw.rect(core.screen, (255, 255, 255), self.groundRect)
 
 
 
