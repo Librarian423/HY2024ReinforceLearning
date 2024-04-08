@@ -26,9 +26,9 @@ class Map(object):
     """
 
     def __init__(self, world_num):
-        self.obj = []
-        self.obj_bg = []
-
+        self.obj = [] #Foreground objects
+        self.obj_bg = [] #Background objects
+        
         self.tubes = []
 
         self.debris = []
@@ -38,12 +38,12 @@ class Map(object):
         self.map = 0
         self.flag = None
 
-        self.mapSize = (0, 0)
-        self.sky = 0
+        self.mapSize = (0, 0) #width, height
+        self.sky = 0          #surface
 
         self.textures = {}
         self.worldNum = world_num
-        self.loadWorld_11()
+        self.loadWorld()
 
         self.is_mob_spawned = [False, False]
         self.score_for_killing_mob = 100
@@ -59,12 +59,12 @@ class Map(object):
 
         self.oPlayer = Player(x_pos=128, y_pos=351)
 
-    def loadWorld_11(self):
+    def loadWorld(self):
         tmx_data = load_pygame("Assets/worlds/tmx/W11.tmx")
         self.mapSize = (tmx_data.width, tmx_data.height)
 
         self.sky = pg.Surface((WINDOW_W, WINDOW_H))
-        self.sky.fill((pg.Color('#5c94fc')))
+        self.sky.fill((pg.Color('#5c94fc'))) #Background color
 
         # 2D List
         self.map = [[0] * tmx_data.height for i in range(tmx_data.width)]
@@ -148,7 +148,14 @@ class Map(object):
             self.map[x + 1][y + 3]
         )
 
-    # code to get position where player is currently standing on the gound
+    def get_block_id(self, x, y):
+        if self.map[x][y] != 0 and self.map[x][y].type != 'BGObject':
+            return ((self.map[x][y]).get_id())
+
+    def set_block_shake(self, x, y):
+        if self.map[x][y] != 0 and self.map[x][y].type != 'BGObject':
+            if (self.map[x][y]).get_id() == 22 or 23:
+                self.map[x][y].set_shake_true()
 
     def get_blocks_below(self, x, y):
         # return two blocks where player is standing
