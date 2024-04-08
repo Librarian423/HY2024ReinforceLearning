@@ -29,10 +29,9 @@ class Player(object):
         self.direction = True
         self.on_ground = False
         self.fast_moving = False
-        
+
         self.pos_x = x_pos
 
-        self.image = pg.image.load('Assets/images/Mario/mario.png').convert_alpha()
         self.sprites = []
         self.load_sprites()
 
@@ -65,19 +64,13 @@ class Player(object):
             # 7 Small, stop
             pg.image.load('Assets/images/Mario/mario_st.png')]
 
-
-
         # Left side
         for i in range(len(self.sprites)):
             self.sprites.append(pg.transform.flip(self.sprites[i], 180, 0))
 
-       
     def update(self, core):
         self.player_physics(core)
         self.update_image(core)
-      
-
-
 
     def player_physics(self, core):
         if core.keyR:
@@ -87,16 +80,15 @@ class Player(object):
             self.x_vel -= SPEED_INCREASE_RATE
             self.direction = False
         if not core.keyU:
-            self.already_jumped = False
+            self.already_jumped = False  # why?
         elif core.keyU:
             if self.on_ground and not self.already_jumped:
                 self.y_vel = -JUMP_POWER
                 self.already_jumped = True
                 self.next_jump_time = pg.time.get_ticks() + 750
-                
 
-        #if player is not playing game, decrease the speed of the Mario
-        if not(core.keyR or core.keyL):
+        # if player is not playing game, decrease the speed of the Mario
+        if not (core.keyR or core.keyL):
             if self.x_vel > 0:
                 self.x_vel -= SPEED_DECREASE_RATE
 
@@ -105,7 +97,7 @@ class Player(object):
 
 
         else:
-            #restrain like threshold which player MArio cannot pass
+            # restrain like threshold which player MArio cannot pass
             if self.x_vel > 0:
                 if self.fast_moving:
                     if self.x_vel > MAX_FASTMOVE_SPEED:
@@ -115,7 +107,7 @@ class Player(object):
                         if self.x_vel > MAX_MOVE_SPEED:
                             self.x_vel = MAX_MOVE_SPEED
 
-            #move in left direction
+            # move in left direction
             if self.x_vel < 0:
                 if self.fast_moving:
                     if (-self.x_vel) > MAX_FASTMOVE_SPEED:
@@ -125,69 +117,63 @@ class Player(object):
                         if (-self.x_vel) > MAX_MOVE_SPEED:
                             self.x_vel = -MAX_MOVE_SPEED
 
-
-
-        #write a code for solving computational error
+        # write a code for solving computational error
         if 0 < self.x_vel < SPEED_DECREASE_RATE:
             self.x_vel = 0
-        
-        if 0 > self.x_vel >  -SPEED_DECREASE_RATE:
+
+        if 0 > self.x_vel > -SPEED_DECREASE_RATE:
             self.x_vel = 0
 
-
-        #introduce a proper movement of leg of mario
-        #moving Up i/e. JUMP action for MARIO
+        # introduce a proper movement of leg of mario
+        # moving Up i/e. JUMP action for MARIO
         if not self.on_ground:
-            #button up is pressed
+            # button up is pressed
             if (self.y_vel < 0 and core.keyU):
                 self.y_vel += GRAVITY
 
             elif (self.y_vel < 0 and not core.keyU):
                 self.y_vel += GRAVITY * LOW_JUMP_MULTIPLIER
 
-            #moving down
+            # moving down
             else:
                 self.y_vel += GRAVITY * FALL_MULTIPLIER
-
 
             if self.y_vel > MAX_FALL_SPEED:
                 self.y_vel = MAX_FALL_SPEED
 
-
-        
-
-
-        blocks = core.get_map().get_blocks_for_collision(self.rect.x // 32, 
-                                                        self.rect.y // 32)
+        blocks = core.get_map().get_blocks_for_collision(self.rect.x // 32, self.rect.y // 32)
 
         self.pos_x += self.x_vel
         self.rect.x = self.pos_x
 
-        #this function allows to stop when player collides with bricks
+        # this function allows to stop when player collides with bricks
         self.update_x_pos(blocks)
 
         self.rect.y += self.y_vel
         self.update_y_pos(blocks, core)
 
-
-        #on_ground() parameter won't be stable without the following code:
-        #pygame x and y represents top left corner of pygame window
+        # on_ground() parameter won't be stable without the following code:
+        # pygame x and y represents top left corner of pygame window
         coord_y = self.rect.y // 32
         if self.powerLVL > 0:
             coord_y += 1
 
-        #main code
+        # main code
         for block in core.get_map().get_blocks_below(self.rect.x // 32, coord_y):
             if block != 0 and block.type != 'BGObject':
-                
-                if pg.Rect(self.rect.x, self.rect.y + 1, self.rect.w, self.rect.h) \
-                .colliderect(block.rect):
-                    
+
+                if pg.Rect(self.rect.x, self.rect.y + 1, self.rect.w, self.rect.h).colliderect(block.rect):
                     self.on_ground = True
 
-
-
     def update_x_pos(self, blocks):
+
+        if self.rect.left < 0:
+            self.rect.left = 0
+            self.pos_x = self.rect.left
+            self.x_vel = 0
+        elif self.rect.right > WINDOW_H:
+            pass
+
         for block in blocks:
             if block != 0 and block.type != 'BGObject':
                 block.debugLight = True
@@ -195,13 +181,19 @@ class Player(object):
                     if self.x_vel > 0:
                         self.rect.right = block.rect.left
                         self.pos_x = self.rect.left
-                        self.x_vel = 0 #idle stop moving
+                        self.x_vel = 0  # idle stop moving
                     elif self.x_vel < 0:
                         self.rect.left = block.rect.right
                         self.pos_x = self.rect.left
                         self.x_vel = 0
 
     def update_y_pos(self, blocks, core):
+        if self.rect.bottom > WINDOW_H:
+            self.rect.bottom = WINDOW_H
+            self.y_vel = 0
+            self.on_ground = True
+            return
+            # die
         self.on_ground = False
         for block in blocks:
             if block != 0 and block.type != 'BGObject':
@@ -215,24 +207,14 @@ class Player(object):
                     elif self.y_vel < 0:
                         self.rect.top = block.rect.bottom
                         self.y_vel = -self.y_vel / 3
-        
+                        self.activate_block_action(core, block)
 
-
-
-
-
-
-
-
-
-
-       
-
-
+    def activate_block_action(self, core, block):
+        pass
 
     def set_image(self, image_id):
         if self.direction:
-            self.image = self.sprites[image_id % 8] 
+            self.image = self.sprites[image_id % 8]
         else:
             self.image = self.sprites[((image_id) % 8) + 8]
 
@@ -255,10 +237,10 @@ class Player(object):
                     (self.x_vel > 0 and not (core.keyL or core.keyR)) or
                     (self.x_vel < 0 and not (core.keyL or core.keyR))
             ):
-                             
+
                 if (self.spriteTick > 30):
                     self.spriteTick = 0
-                   
+
                 if self.spriteTick <= 10:
                     self.set_image(1)
                 elif 11 <= self.spriteTick <= 20:
@@ -277,7 +259,6 @@ class Player(object):
             if not self.on_ground:
                 self.spriteTick = 0
                 self.set_image(4)
-
 
     def render(self, core):
         if self.visible:

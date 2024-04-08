@@ -10,10 +10,13 @@ from Platform import Platform
 
 from Camera import Camera
 from Player import Player
+from Mob import Mob
 
 from Tube import Tube
 
 from BGObject import BGObject
+
+
 class Map(object):
     """
 
@@ -25,7 +28,7 @@ class Map(object):
     def __init__(self, world_num):
         self.obj = []
         self.obj_bg = []
-        
+
         self.tubes = []
 
         self.debris = []
@@ -54,7 +57,6 @@ class Map(object):
         self.oGameUI = GameUI()
         self.oCamera = Camera(self.mapSize[0] * 32, 14)
 
-
         self.oPlayer = Player(x_pos=128, y_pos=351)
 
     def loadWorld_11(self):
@@ -66,8 +68,6 @@ class Map(object):
 
         # 2D List
         self.map = [[0] * tmx_data.height for i in range(tmx_data.width)]
-
-        
 
         layer_num = 0
         for layer in tmx_data.visible_layers:
@@ -83,13 +83,13 @@ class Map(object):
 
                         if layer.name == 'Foreground':
 
-                            # 22 ID is a question block, so in taht case we shoud load all it's images
+                            # 22 ID is a question block, so in that case we should load all it's images
                             if tileID == 22:
                                 image = (
-                                    image,                                      # 1
-                                    tmx_data.get_tile_image(0, 15, layer_num),   # 2
-                                    tmx_data.get_tile_image(1, 15, layer_num),   # 3
-                                    tmx_data.get_tile_image(2, 15, layer_num)    # activated
+                                    image,  # 1
+                                    tmx_data.get_tile_image(0, 15, layer_num),  # 2
+                                    tmx_data.get_tile_image(1, 15, layer_num),  # 3
+                                    tmx_data.get_tile_image(2, 15, layer_num)  # activated
                                 )
 
                             self.map[x][y] = Platform(x * tmx_data.tileheight, y * tmx_data.tilewidth, image, tileID)
@@ -100,15 +100,15 @@ class Map(object):
                             self.obj_bg.append(self.map[x][y])
             layer_num += 1
 
-      
-        #tubes collection
+        # tubes collection
         self.spawn_tube(28, 10)
         self.spawn_tube(37, 9)
         self.spawn_tube(46, 8)
         self.spawn_tube(55, 8)
         self.spawn_tube(163, 10)
         self.spawn_tube(179, 10)
-
+        self.spawn_mob(0, 351, 'goombas')
+        self.spawn_mob(188, 351, 'goombas')
 
     def get_player(self):
         return self.oPlayer
@@ -116,19 +116,21 @@ class Map(object):
     def get_Camera(self):
         return self.oCamera
 
-
     def spawn_tube(self, x_coord, y_coord):
         self.tubes.append(Tube(x_coord, y_coord))
 
-        for y in range(y_coord, 12): #12 is because it ground level
+        for y in range(y_coord, 12):  # 12 is because it ground level
             for x in range(x_coord, x_coord + 2):
-                self.map[x][y] = Platform(x*32, y*32, image = None, type_id= 0)
-            
+                self.map[x][y] = Platform(x * 32, y * 32, image=None, type_id=0)
 
+    def spawn_mob(self, x_pos, y_pos, name):
+        index = len(self.mobs)
+        self.mobs.append(Mob(x_pos, y_pos, name, index))
+        # self.is_mob_spawned[0] = True
 
     # Returns tiles around the entity
     def get_blocks_for_collision(self, x, y):
-        
+
         return (
             self.map[x][y - 1],
             self.map[x][y + 1],
@@ -146,41 +148,35 @@ class Map(object):
             self.map[x + 1][y + 3]
         )
 
- 
+    # code to get position where player is currently standing on the gound
 
-#code to get position where player is currently standing on the gound
-    
     def get_blocks_below(self, x, y):
-        #return two blocks where player is standing
+        # return two blocks where player is standing
         return (
             self.map[x][y + 1],
-            self.map[x+ 1][y + 1]
+            self.map[x + 1][y + 1]
         )
-
-
-
 
     def update_player(self, core):
         self.get_player().update(core)
 
-   
-
+    def update_mobs(self, core):
+        for mob in self.mobs:
+            mob.update(core)
 
     def update(self, core):
 
-        
         if not core.get_map().in_event:
             self.update_player(core)
+            self.update_mobs(core)
 
         else:
             self.get_event().update(core)
 
-        #this is code to make move for the camera
+        # this is code to make move for the camera
         if not self.in_event:
             self.get_Camera().update(core.get_map().get_player().rect)
-      
-        
-    
+
     def render_map(self, core):
         """
 
@@ -205,18 +201,21 @@ class Map(object):
         core.screen.blit(self.sky, (0, 0))
 
         for obj in self.obj_bg:
-            obj.render(core) #clouds and so on
-
+            obj.render(core)  # clouds and so on
 
         for tube in self.tubes:
             tube.render(core)
 
         for obj in self.obj:
-            obj.render(core) #bricks
+            obj.render(core)  # bricks
 
-        self.get_player().render(core) #player
+        for mob in self.mobs:
+            mob.render(core)
 
-     
+        self.get_player().render(core)  # player
+
+
+
 
 
 
