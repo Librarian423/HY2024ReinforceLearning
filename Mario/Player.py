@@ -1,5 +1,7 @@
 import pygame as pg
 from Const import *
+from pygame.locals import QUIT,Rect
+
 
 
 class Player(object):
@@ -37,8 +39,17 @@ class Player(object):
 
         self.rect = pg.Rect(x_pos, y_pos, 32, 32)
         self.groundRect = pg.Rect(x_pos, y_pos+31, 20, 5)
+        self.hitBlockRect = pg.Rect(x_pos, y_pos, 25, 5)
 
 
+    def updateRectPos(self):
+        self.hitBlockRect.x = self.rect.x
+        self.hitBlockRect.y = self.rect.y
+        self.hitBlockRect.x += 5
+        self.hitBlockRect.y -= 1
+        # print("x hit " + str(self.hitBlockRect.x))
+        # print("y hit " + str(self.hitBlockRect.y))
+        # print("\n---------------------------\n")
     def load_sprites(self):
         self.sprites = [
             # 0 Small, stay
@@ -73,6 +84,7 @@ class Player(object):
     def update(self, core):
         self.player_physics(core)
         self.update_image(core)
+        self.updateRectPos()
 
     def player_physics(self, core):
         if core.keyR:
@@ -176,6 +188,7 @@ class Player(object):
             self.rect.left = 0
             self.pos_x = self.rect.left
             self.x_vel = 0
+
         elif self.rect.right > WINDOW_H:
             pass
 
@@ -198,14 +211,20 @@ class Player(object):
             self.y_vel = 0
             self.on_ground = True
             return
+
             # die
         self.on_ground = False
         for block in blocks:
             if block != 0 and block.type != 'BGObject':
+                #Reset hitblockRect position
+                # self.hitBlockRect.x = self.rect.x
+                # self.hitBlockRect.y = self.rect.y
+                if pg.Rect.colliderect(self.hitBlockRect, block.rect):
+                    blockX = block.rect.left // 32
+                    blockY = block.rect.top // 32
+                    self.check_upper_block(blockX, blockY,self.hitBlockRect,core)
                 if pg.Rect.colliderect(self.rect, block.rect):
-                    #check
-                    self.check_upper_block(self.rect,core)
-
+                    #self.check_upper_block(self.rect, core)
                     if self.y_vel > 0:
                         self.on_ground = True
                         self.rect.bottom = block.rect.top
@@ -215,15 +234,19 @@ class Player(object):
                         self.rect.top = block.rect.bottom
                         self.y_vel = -self.y_vel / 3
 
-    def check_upper_block(self, character, core):
+        #self.hitBlockRect.y = self.rect.y
 
-        x_temp = character.x // 32
-        #x_temp = int(tc.clamp(x_temp, min=x_temp-0.5, max=x_temp+0.5))
-        y_temp = character.y // 32
-        #print(x_temp, y_temp)
-        #print("block id",core.get_map().get_block_id(x_temp, y_temp))
-        if core.get_map().get_block_id(x_temp, y_temp) == 22:
-            core.get_map().set_block_shake(x_temp, y_temp)
+        #print("y rect " + str(self.rect.y))
+
+    def check_upper_block(self, xCord, yCord,  character, core):
+
+        # x_temp = character.x // 32
+        # #x_temp = int(tc.clamp(x_temp, min=x_temp-0.5, max=x_temp+0.5))
+        # y_temp = character.y // 32
+        # print(x_temp, y_temp)
+        # print("block id",core.get_map().get_block_id(x_temp, y_temp))
+        if core.get_map().get_block_id(xCord, yCord) == 22:
+            core.get_map().set_block_shake(xCord, yCord)
             #print("hit")
         # elif core.get_map().get_block_id(x_temp+1, y_temp) == 22:
         #     core.get_map().set_block_shake(x_temp+1, y_temp)
@@ -232,9 +255,9 @@ class Player(object):
         #     core.get_map().set_block_shake(x_temp-1, y_temp)
         #     print("hit")
 
-        if core.get_map().get_block_id(x_temp, y_temp) == 23:
+        if core.get_map().get_block_id(xCord, yCord) == 23:
             #print("shake")
-            core.get_map().set_block_shake(x_temp, y_temp)
+            core.get_map().set_block_shake(xCord, yCord)
             #print("hit")
         # elif core.get_map().get_block_id(x_temp+1, y_temp) == 23:
         #     core.get_map().set_block_shake(x_temp+1, y_temp)
@@ -297,10 +320,9 @@ class Player(object):
                 self.set_image(4)
 
     def render(self, core):
+        pg.draw.rect(core.screen, (255, 255, 255), self.hitBlockRect)
         if self.visible:
             core.screen.blit(self.image, core.get_map().get_Camera().apply(self))
-        pg.draw.rect(core.screen, (255, 255, 255), self.groundRect)
-
 
 
 
