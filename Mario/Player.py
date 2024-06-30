@@ -42,7 +42,6 @@ class Player(object):
         self.groundRect = pg.Rect(x_pos+8, y_pos+28, 16, 4)
         self.hitBlockRect = pg.Rect(x_pos, y_pos, 25, 5)
 
-
     def updateRectPos(self):
         self.hitBlockRect.x = self.rect.x
         self.hitBlockRect.y = self.rect.y
@@ -87,12 +86,12 @@ class Player(object):
 
 
     def update(self, core):
-        self.player_physics(core)
-        self.update_image(core)
-        self.updateRectPos()
+        if self.player_physics(core):
+            self.update_image(core)
+            self.updateRectPos()
 
     def die(self, core):
-        self.numOfLives = self.numOfLives - 1
+        self.numOfLives -= 1
         core.get_map().get_event().start_kill(core, not self.numOfLives)
 
     def player_physics(self, core):
@@ -178,6 +177,8 @@ class Player(object):
 
         self.rect.y += self.y_vel
         self.update_y_pos(blocks, mobs, core)
+        if core.get_map().get_event().killed:
+            return False
 
         # on_ground() parameter won't be stable without the following code:
         # pygame x and y represents top left corner of pygame window
@@ -191,6 +192,7 @@ class Player(object):
                 if pg.Rect(self.rect.x, self.rect.y + 1, self.rect.w, self.rect.h).colliderect(block.rect):
                     self.on_ground = True
 
+        return True
 
 
 
@@ -218,7 +220,7 @@ class Player(object):
                         self.x_vel = 0
 
         for mob in mobs:
-            if mob.dead:
+            if mob.dead and mob.name != "koopa":
                 continue
             if pg.Rect.colliderect(self.rect, mob.rect):
                 mob.collided = True
@@ -243,7 +245,7 @@ class Player(object):
         self.on_ground = False
         for block in blocks:
             if block != 0 and block.type != 'BGObject':
-                #Reset hitblockRect position
+                # Reset hitblockRect position
                 # self.hitBlockRect.x = self.rect.x
                 # self.hitBlockRect.y = self.rect.y
                 if pg.Rect.colliderect(self.hitBlockRect, block.rect):
@@ -265,16 +267,22 @@ class Player(object):
             if not mob.collided:
                 continue
             mob.collided = False
+            if mob.weaponized:
+                self.die(core)
+                return
             if self.y_vel > 0:
                 self.rect.bottom = mob.rect.top
                 self.y_vel = -self.y_vel
-                self.score += SCORES[mob.name]
-                mob.get_killed()
+                if not mob.dead:
+                    self.score += SCORES[mob.name]
+                    mob.get_killed(0)
+                else:  # koopa
+                    mob.get_weaponized(self.x_vel)
             else:
-                self.die(core)
-
-
-
+                if not mob.dead:
+                    self.die(core)
+                else:
+                    mob.get_weaponized(self.x_vel)
 
         #self.hitBlockRect.y = self.rect.y
 
@@ -314,15 +322,14 @@ class Player(object):
         pass
 
     def set_image(self, image_id):
-        # If player died
-        if image_id == -1:
+        if image_id == -1: # player dead
             self.image = self.sprites[len(self.sprites) - 1]
             return
 
         if self.direction:
             self.image = self.sprites[image_id % 8]
         else:
-            self.image = self.sprites[((image_id) % 8) + 8]
+            self.image = self.sprites[(image_id % 8) + 8]
 
     def update_image(self, core):
 
@@ -367,28 +374,6 @@ class Player(object):
                 self.set_image(4)
 
     def render(self, core):
-        core.screen.blit(self.hitBlockRect)
         #pg.draw.rect(core.screen, (255, 255, 255), self.hitBlockRect)
         if self.visible:
             core.screen.blit(self.image, core.get_map().get_Camera().apply(self))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

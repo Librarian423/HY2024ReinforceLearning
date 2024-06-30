@@ -47,7 +47,7 @@ class Map(object):
         self.worldNum = world_num
         self.loadWorld()
 
-        self.is_mob_spawned = [False, False]
+        # self.is_mob_spawned = [False, False]
         self.score_for_killing_mob = 100
         self.score_time = 0
 
@@ -152,7 +152,6 @@ class Map(object):
     def spawn_mob(self, x_pos, y_pos, name):
         index = len(self.mobs)
         self.mobs.append(Mob(x_pos, y_pos, name, index))
-        # self.is_mob_spawned[0] = True
 
     # Returns tiles around the entity
     def get_blocks_for_collision(self, x, y):
@@ -199,7 +198,7 @@ class Map(object):
 
     def update(self, core):
 
-        if not core.get_map().in_event:
+        if not self.in_event:
             self.update_player(core)
             self.update_mobs(core)
         else:
