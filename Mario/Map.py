@@ -13,6 +13,7 @@ from Player import Player
 from Mob import Mob
 
 from Tube import Tube
+from Flag import Flag
 
 from BGObject import BGObject
 
@@ -28,7 +29,8 @@ class Map(object):
     def __init__(self, world_num):
         self.obj = [] #Foreground objects
         self.obj_bg = [] #Background objects
-        
+
+        self.flags = []
         self.tubes = []
 
         self.debris = []
@@ -36,7 +38,7 @@ class Map(object):
         self.projectiles = []
         self.text_objects = []
         self.map = 0
-        self.flag = None
+        #self.flag = None
 
         self.mapSize = (0, 0) #width, height
         self.sky = 0          #surface
@@ -101,6 +103,8 @@ class Map(object):
             layer_num += 1
 
         # tubes collection
+        self.spawn_flag(1, 1.5)
+        self.spawn_flag(198.25,1.5)
         self.spawn_tube(28, 10)
         self.spawn_tube(37, 9)
         self.spawn_tube(46, 8)
@@ -115,6 +119,9 @@ class Map(object):
 
     def get_Camera(self):
         return self.oCamera
+
+    def spawn_flag(self, x_coord, y_coord):
+        self.flags.append(Flag(x_coord, y_coord))
 
     def spawn_tube(self, x_coord, y_coord):
         self.tubes.append(Tube(x_coord, y_coord))
@@ -199,6 +206,9 @@ class Map(object):
         for tube in self.tubes:
             tube.render(core)
 
+        for flag in self.flags:
+            flag.render(core)
+
     def render(self, core):
         """
 
@@ -212,6 +222,9 @@ class Map(object):
 
         for tube in self.tubes:
             tube.render(core)
+
+        for flag in self.flags:
+            flag.render(core)
 
         for obj in self.obj:
             obj.render(core)  # bricks
