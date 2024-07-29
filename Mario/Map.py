@@ -60,6 +60,8 @@ class Map(object):
         self.oCamera = Camera(self.mapSize[0] * 32, 14)
 
         self.oPlayer = Player(x_pos=128, y_pos=351)
+        self.oGameUI = GameUI()
+
 
     def loadWorld(self):
         tmx_data = load_pygame("Assets/worlds/tmx/W11.tmx")
@@ -119,6 +121,13 @@ class Map(object):
 
     def get_Camera(self):
         return self.oCamera
+
+    def get_name(self):
+        if self.worldNum == '1-1':
+            return '1-1'
+
+    def get_ui(self):
+        return self.oGameUI
 
     def spawn_flag(self, x_coord, y_coord):
         self.flags.append(Flag(x_coord, y_coord))
@@ -233,6 +242,8 @@ class Map(object):
             mob.render(core)
 
         self.get_player().render(core)  # player
+
+        self.get_ui().render(core) #UI
 
 
 
