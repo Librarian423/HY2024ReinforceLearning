@@ -19,7 +19,7 @@ class Core(object):
         environ['SDL_VIDEO_CENTERED'] = '1'
         
         pg.init()
-        pg.display.set_caption('Mario by S&D')
+        pg.display.set_caption('Reinforcement Learning')
         pg.display.set_mode((WINDOW_W, WINDOW_H))
 
         self.screen = pg.display.set_mode((WINDOW_W, WINDOW_H))
@@ -51,7 +51,6 @@ class Core(object):
 
     def input_player(self):
         for e in pg.event.get():
-
             if e.type == pg.QUIT:
                 self.run = False
 

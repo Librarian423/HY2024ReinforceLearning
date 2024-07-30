@@ -1,6 +1,7 @@
 import pygame as pg
 
 
+
 class GameUI(object):
     def __init__(self):
         self.font = pg.font.Font('Assets/fonts/emulogic.ttf', 20)

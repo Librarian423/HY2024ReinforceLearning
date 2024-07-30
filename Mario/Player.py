@@ -6,6 +6,7 @@ from pygame.locals import QUIT,Rect
 
 class Player(object):
     def __init__(self, x_pos, y_pos):
+        # life
         self.numOfLives = 3
         self.score = 0
         self.coins = 0
@@ -38,7 +39,7 @@ class Player(object):
         self.load_sprites()
 
         self.rect = pg.Rect(x_pos, y_pos, 32, 32)
-        self.groundRect = pg.Rect(x_pos, y_pos+31, 20, 5)
+        self.groundRect = pg.Rect(x_pos+8, y_pos+28, 16, 4)
         self.hitBlockRect = pg.Rect(x_pos, y_pos, 25, 5)
 
 
@@ -81,10 +82,18 @@ class Player(object):
         for i in range(len(self.sprites)):
             self.sprites.append(pg.transform.flip(self.sprites[i], 180, 0))
 
+        # Dead(should always be at last)
+        self.sprites.append(pg.image.load('Assets/images/Mario/mario_death.png'))
+
+
     def update(self, core):
         self.player_physics(core)
         self.update_image(core)
         self.updateRectPos()
+
+    def die(self, core):
+        self.numOfLives = self.numOfLives - 1
+        core.get_map().get_event().start_kill(core, not self.numOfLives)
 
     def player_physics(self, core):
         if core.keyR:
@@ -134,11 +143,11 @@ class Player(object):
         # write a code for solving computational error
         if 0 < self.x_vel < SPEED_DECREASE_RATE:
             self.x_vel = 0
-            self.groundRect.x = self.pos_x
+            self.groundRect.x = self.pos_x+6
 
         if 0 > self.x_vel > -SPEED_DECREASE_RATE:
             self.x_vel = 0
-            self.groundRect.x = self.pos_x
+            self.groundRect.x = self.pos_x+6
 
         # introduce a proper movement of leg of mario
         # moving Up i/e. JUMP action for MARIO
@@ -158,23 +167,23 @@ class Player(object):
                 self.y_vel = MAX_FALL_SPEED
 
         blocks = core.get_map().get_blocks_for_collision(self.rect.x // 32, self.rect.y // 32)
+        mobs = core.get_map().get_mobs()
 
         self.pos_x += self.x_vel
         self.rect.x = self.pos_x
-        self.groundRect.x = self.pos_x
+        self.groundRect.x = self.pos_x+6
 
         # this function allows to stop when player collides with bricks
-        self.update_x_pos(blocks)
+        self.update_x_pos(blocks, mobs)
 
         self.rect.y += self.y_vel
-        self.update_y_pos(blocks, core)
+        self.update_y_pos(blocks, mobs, core)
 
         # on_ground() parameter won't be stable without the following code:
         # pygame x and y represents top left corner of pygame window
         coord_y = self.rect.y // 32
         if self.powerLVL > 0:
             coord_y += 1
-
         # main code
         for block in core.get_map().get_blocks_below(self.rect.x // 32, coord_y):
             if block != 0 and block.type != 'BGObject':
@@ -182,14 +191,17 @@ class Player(object):
                 if pg.Rect(self.rect.x, self.rect.y + 1, self.rect.w, self.rect.h).colliderect(block.rect):
                     self.on_ground = True
 
-    def update_x_pos(self, blocks):
+
+
+
+    def update_x_pos(self, blocks, mobs):
 
         if self.rect.left < 0:
             self.rect.left = 0
             self.pos_x = self.rect.left
             self.x_vel = 0
 
-        elif self.rect.right > WINDOW_H:
+        elif self.rect.right > WINDOW_W:
             pass
 
         for block in blocks:
@@ -205,14 +217,29 @@ class Player(object):
                         self.pos_x = self.rect.left
                         self.x_vel = 0
 
-    def update_y_pos(self, blocks, core):
+        for mob in mobs:
+            if mob.dead:
+                continue
+            if pg.Rect.colliderect(self.rect, mob.rect):
+                mob.collided = True
+                # if self.x_vel > 0:
+                #     self.rect.right = mob.rect.left
+                #     self.pos_x = self.rect.left
+                #     self.x_vel = 0
+                # elif self.x_vel < 0:
+                #     self.rect.left = mob.rect.right
+                #     self.pos_x = self.rect.left
+                #     self.x_vel = 0
+
+
+
+    def update_y_pos(self, blocks, mobs, core):
+
+        # WINDOW_H???
         if self.rect.bottom > WINDOW_H:
-            self.rect.bottom = WINDOW_H
-            self.y_vel = 0
-            self.on_ground = True
+            self.die(core)
             return
 
-            # die
         self.on_ground = False
         for block in blocks:
             if block != 0 and block.type != 'BGObject':
@@ -222,7 +249,7 @@ class Player(object):
                 if pg.Rect.colliderect(self.hitBlockRect, block.rect):
                     blockX = block.rect.left // 32
                     blockY = block.rect.top // 32
-                    self.check_upper_block(blockX, blockY,self.hitBlockRect,core)
+                    self.check_upper_block(blockX, blockY,self.hitBlockRect, core)
                 if pg.Rect.colliderect(self.rect, block.rect):
                     #self.check_upper_block(self.rect, core)
                     if self.y_vel > 0:
@@ -233,6 +260,21 @@ class Player(object):
                     elif self.y_vel < 0:
                         self.rect.top = block.rect.bottom
                         self.y_vel = -self.y_vel / 3
+
+        for mob in mobs:
+            if not mob.collided:
+                continue
+            mob.collided = False
+            if self.y_vel > 0:
+                self.rect.bottom = mob.rect.top
+                self.y_vel = -self.y_vel
+                self.score += SCORES[mob.name]
+                mob.get_killed()
+            else:
+                self.die(core)
+
+
+
 
         #self.hitBlockRect.y = self.rect.y
 
@@ -272,6 +314,11 @@ class Player(object):
         pass
 
     def set_image(self, image_id):
+        # If player died
+        if image_id == -1:
+            self.image = self.sprites[len(self.sprites) - 1]
+            return
+
         if self.direction:
             self.image = self.sprites[image_id % 8]
         else:

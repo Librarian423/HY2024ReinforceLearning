@@ -5,7 +5,7 @@ from Const import *
 #UPDATE CHECK KILL 
 class Event(object):
     def __init__(self):
-        pass
+        self.killed = False
 
        
 
@@ -19,8 +19,15 @@ class Event(object):
         Player gets killed.
 
         """
-        pass
-       
+        core.get_map().set_event()
+        self.killed = True
+
+        player = core.get_map().get_player()
+        player.y_vel = 2.0
+
+        if game_over:
+            pass
+
 
     def start_win(self, core):
         """
@@ -31,11 +38,12 @@ class Event(object):
         pass
        
     def update(self, core):
-        pass
-        
-
-
-
+        player = core.get_map().get_player()
+        if self.killed:
+            player.set_image(-1)
+            player.rect.y += player.y_vel
+            if player.rect.y == WINDOW_H:
+                player.y_vel = 0
 
 
 

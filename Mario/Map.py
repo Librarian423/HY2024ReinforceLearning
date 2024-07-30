@@ -115,9 +115,13 @@ class Map(object):
         self.spawn_tube(179, 10)
         self.spawn_mob(0, 351, 'goombas')
         self.spawn_mob(188, 351, 'goombas')
+        self.spawn_mob(230, 351, 'koopa')
 
     def get_player(self):
         return self.oPlayer
+
+    def get_mobs(self):
+        return self.mobs
 
     def get_Camera(self):
         return self.oCamera
@@ -131,6 +135,12 @@ class Map(object):
 
     def spawn_flag(self, x_coord, y_coord):
         self.flags.append(Flag(x_coord, y_coord))
+
+    def get_event(self):
+        return self.oEvent
+
+    def set_event(self):
+        self.in_event = True
 
     def spawn_tube(self, x_coord, y_coord):
         self.tubes.append(Tube(x_coord, y_coord))
@@ -192,7 +202,6 @@ class Map(object):
         if not core.get_map().in_event:
             self.update_player(core)
             self.update_mobs(core)
-
         else:
             self.get_event().update(core)
 
