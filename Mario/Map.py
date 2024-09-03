@@ -1,6 +1,5 @@
 import pygame as pg
 from pytmx.util_pygame import load_pygame
-
 from GameUI import GameUI
 
 from Event import Event
@@ -11,12 +10,11 @@ from Platform import Platform
 from Camera import Camera
 from Player import Player
 from Mob import Mob
-
+from MenuManager import MenuManager
 from Tube import Tube
 from Flag import Flag
 
 from BGObject import BGObject
-
 
 class Map(object):
     """
@@ -53,7 +51,7 @@ class Map(object):
 
         self.in_event = False
         self.tick = 0
-        self.time = 400
+        self.time = 10#400
 
         self.oEvent = Event()
         self.oGameUI = GameUI()
@@ -62,6 +60,8 @@ class Map(object):
         self.oPlayer = Player(x_pos=128, y_pos=351)
         self.oGameUI = GameUI()
 
+    def get_time(self):
+        return (self.time)
 
     def loadWorld(self):
         tmx_data = load_pygame("Assets/worlds/tmx/W11.tmx")
@@ -200,6 +200,25 @@ class Map(object):
         if not self.in_event:
             self.get_Camera().update(core.get_map().get_player().rect)
 
+        self.update_time(core)
+
+    def update_time(self, core):
+        """
+        Updating a map time.
+        """
+        # Time updates only if map not in event
+        if not self.in_event:
+            self.tick += 1
+            if self.tick % 40 == 0:
+                self.time -= 1
+                self.tick = 0
+            # if self.time == 100 and self.tick == 1:
+            #     core.get_sound().start_fast_music(core)
+
+
+
+
+
     def render_map(self, core):
         """
 
@@ -244,30 +263,3 @@ class Map(object):
         self.get_player().render(core)  # player
 
         self.get_ui().render(core) #UI
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
