@@ -17,7 +17,7 @@ class Core(object):
     """
     def __init__(self):
         environ['SDL_VIDEO_CENTERED'] = '1'
-        
+
         pg.init()
         pg.display.set_caption('Mario by S&D')
         pg.display.set_mode((WINDOW_W, WINDOW_H))
@@ -119,8 +119,7 @@ class Core(object):
         self.keyU = True
 
     def get_time(self):
-        return ()
-
+        return (self.oWorld.get_time())
   
 
 

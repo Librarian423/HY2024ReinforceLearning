@@ -41,6 +41,8 @@ class Player(object):
         self.groundRect = pg.Rect(x_pos, y_pos+31, 20, 5)
         self.hitBlockRect = pg.Rect(x_pos, y_pos, 25, 5)
 
+    def get_score(self):
+        return (self.score)
 
     def updateRectPos(self):
         self.hitBlockRect.x = self.rect.x
