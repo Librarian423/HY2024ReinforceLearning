@@ -10,10 +10,12 @@ class Event(object):
         self.killed = False  # killed or win
         self.game_over = False
 
-       
 
     def reset(self):
-        pass
+        self.x_vel = 0
+        self.y_vel = 0
+        self.killed = False  # killed or win
+        self.game_over = False
        
 
     def start_kill(self, core, game_over):
@@ -25,21 +27,6 @@ class Event(object):
         self.y_vel = -4.0
 
         self.game_over = game_over
-
-
-
-    # self.type = 0
-    # self.delay = 4000
-    # self.y_vel = -4
-    # self.time = pg.time.get_ticks()
-    #
-    #
-    # core.get_sound().stop('overworld')
-    # core.get_sound().stop('overworld_fast')
-    # core.get_sound().play('death', 0, 0.5)
-    #
-    # # Sets "dead" sprite
-
 
 
     def start_win(self, core):
