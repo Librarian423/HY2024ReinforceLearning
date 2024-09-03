@@ -320,7 +320,6 @@ class Player(object):
                 self.set_image(4)
 
     def render(self, core):
-        core.screen.blit(self.hitBlockRect)
         #pg.draw.rect(core.screen, (255, 255, 255), self.hitBlockRect)
         if self.visible:
             core.screen.blit(self.image, core.get_map().get_Camera().apply(self))

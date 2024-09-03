@@ -36,6 +36,7 @@ class Core(object):
         self.keyShift = False
 
     def main_loop(self):
+
         while self.run:
             self.input()
 
@@ -44,7 +45,14 @@ class Core(object):
             self.clock.tick(FPS)
 
     def input(self):
+        #if press 0 reset
+        k = pg.key.get_pressed()
         if self.get_mm().currentGameState == 'Game':
+            #reset
+            if k[K_0]:
+                print("reset")
+                self.__init__()
+
             self.input_player()
 
        
@@ -91,6 +99,27 @@ class Core(object):
 
     def get_mm(self):
         return self.oMM
+
+    def restart_game(self):
+        self.__init__()
+
+    def move_left(self):
+        #left
+        self.keyL = True
+        self.keyD = False
+    def move_right(self):
+        #left
+        self.keyR = True
+
+    def move_down(self):
+        #down
+        self.keyD = True
+    def jump(self):
+        #jump
+        self.keyU = True
+
+    def get_time(self):
+        return ()
 
   
 
