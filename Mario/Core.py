@@ -35,6 +35,8 @@ class Core(object):
         self.keyD = False
         self.keyShift = False
 
+        self.is_flag = False
+
     def main_loop(self):
 
         while self.run:
@@ -105,18 +107,37 @@ class Core(object):
 
     def move_left(self):
         #left
+        self.keyShift = True
         self.keyL = True
+        self.keyR = False
+        self.keyU = False
         self.keyD = False
-    def move_right(self):
-        #left
-        self.keyR = True
 
+    def move_right(self):
+        #right
+        self.keyShift = True
+        self.keyL = False
+        self.keyR = True
+        self.keyU = False
+        self.keyD = False
     def move_down(self):
         #down
         self.keyD = True
     def jump(self):
         #jump
-        self.keyU = True
+        if self.keyL == True:
+            self.keyShift = True
+            self.keyR = False
+            self.keyD = False
+            self.keyU = True
+        elif self.keyR == True:
+            self.keyShift = True
+            self.keyL = False
+            self.keyD = False
+            self.keyU = True
+
+    def reached_flag(self):
+        self.is_flag = True
 
     def get_time(self):
         return (self.oWorld.get_time())
