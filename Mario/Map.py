@@ -51,7 +51,7 @@ class Map(object):
 
         self.in_event = False
         self.tick = 0
-        self.time = 10#400
+        self.time = 400
 
         self.oEvent = Event()
         self.oGameUI = GameUI()
@@ -105,7 +105,7 @@ class Map(object):
             layer_num += 1
 
         # tubes collection
-        self.spawn_flag(1, 1.5)
+        #self.spawn_flag(1, 1.5)
         self.spawn_flag(198.25,1.5)
         self.spawn_tube(28, 10)
         self.spawn_tube(37, 9)

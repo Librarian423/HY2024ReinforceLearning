@@ -87,6 +87,7 @@ class Player(object):
         self.player_physics(core)
         self.update_image(core)
         self.updateRectPos()
+        self.has_reached_flag(core)
 
     def player_physics(self, core):
         if core.keyR:
@@ -326,6 +327,11 @@ class Player(object):
         if self.visible:
             core.screen.blit(self.image, core.get_map().get_Camera().apply(self))
 
+    def has_reached_flag(self, core):
+        # 깃대에 도달했는지 확인하는 로직을 구현
+        flag_x_position = 6341.25  # 깃대의 x 좌표 예시
+        if flag_x_position <= self.pos_x:
+            core.reached_flag()
 
 
 
