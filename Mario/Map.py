@@ -45,7 +45,7 @@ class Map(object):
         self.worldNum = world_num
         self.loadWorld()
 
-        self.is_mob_spawned = [False, False]
+        # self.is_mob_spawned = [False, False]
         self.score_for_killing_mob = 100
         self.score_time = 0
 
@@ -115,9 +115,13 @@ class Map(object):
         self.spawn_tube(179, 10)
         self.spawn_mob(0, 351, 'goombas')
         self.spawn_mob(188, 351, 'goombas')
+        self.spawn_mob(230, 351, 'koopa')
 
     def get_player(self):
         return self.oPlayer
+
+    def get_mobs(self):
+        return self.mobs
 
     def get_Camera(self):
         return self.oCamera
@@ -132,6 +136,12 @@ class Map(object):
     def spawn_flag(self, x_coord, y_coord):
         self.flags.append(Flag(x_coord, y_coord))
 
+    def get_event(self):
+        return self.oEvent
+
+    def set_event(self):
+        self.in_event = True
+
     def spawn_tube(self, x_coord, y_coord):
         self.tubes.append(Tube(x_coord, y_coord))
 
@@ -142,7 +152,6 @@ class Map(object):
     def spawn_mob(self, x_pos, y_pos, name):
         index = len(self.mobs)
         self.mobs.append(Mob(x_pos, y_pos, name, index))
-        # self.is_mob_spawned[0] = True
 
     # Returns tiles around the entity
     def get_blocks_for_collision(self, x, y):
@@ -189,10 +198,9 @@ class Map(object):
 
     def update(self, core):
 
-        if not core.get_map().in_event:
+        if not self.in_event:
             self.update_player(core)
             self.update_mobs(core)
-
         else:
             self.get_event().update(core)
 
