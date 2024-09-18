@@ -26,7 +26,8 @@ class Event(object):
         player.set_image(-1)
         self.y_vel = -4.0
 
-        self.game_over = game_over
+        self.game_over = True#game_over
+
 
 
     def start_win(self, core):

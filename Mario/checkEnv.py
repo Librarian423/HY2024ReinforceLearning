@@ -5,7 +5,7 @@ from Core import Core
 
 env = MarioEnv()
 episodes = 50
-
+reward = 0
 for episode in range(episodes):
 	done = False
 	obs = env.reset()
@@ -13,8 +13,9 @@ for episode in range(episodes):
 		random_action = env.action_space.sample()
 		#print("action",random_action)
 		obs, reward, done, info = env.step(random_action)
-		#print('reward',reward)
 		env.render()
+	print('check reward', reward)
+	print(episode)
 
 # It will check your custom environment and output additional warnings if needed
 #check_env(env)

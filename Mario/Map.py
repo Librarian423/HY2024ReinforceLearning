@@ -113,8 +113,8 @@ class Map(object):
         self.spawn_tube(55, 8)
         self.spawn_tube(163, 10)
         self.spawn_tube(179, 10)
-        self.spawn_mob(0, 351, 'goombas')
-        self.spawn_mob(188, 351, 'goombas')
+        self.spawn_mob(900, 351, 'goombas')
+        self.spawn_mob(700, 351, 'goombas')
         self.spawn_mob(230, 351, 'koopa')
 
     def get_player(self):
@@ -201,12 +201,13 @@ class Map(object):
         if not self.in_event:
             self.update_player(core)
             self.update_mobs(core)
+            # this is code to make move for the camera
+            self.get_Camera().update(core.get_map().get_player().rect)
         else:
+            print("map in event")
             self.get_event().update(core)
 
-        # this is code to make move for the camera
-        if not self.in_event:
-            self.get_Camera().update(core.get_map().get_player().rect)
+
 
         self.update_time(core)
 

@@ -328,7 +328,7 @@ class Player(object):
     def set_image(self, image_id):
         if image_id == -1: # player dead
             self.image = self.sprites[len(self.sprites) - 1]
-            return
+            #return
 
         if self.direction:
             self.image = self.sprites[image_id % 8]
@@ -386,4 +386,4 @@ class Player(object):
         # 깃대에 도달했는지 확인하는 로직을 구현
         flag_x_position = 6341.25  # 깃대의 x 좌표 예시
         if flag_x_position <= self.pos_x:
-            core.reached_flag()
+            core.set_flag_true()

@@ -37,6 +37,8 @@ class MarioEnv(gym.Env, object):
                                             dtype=np.uint8)
         self.currentTime = 0
         self.input_cooldown = 200
+        self.score = 0
+        self.reward = 0
 
     def step(self, action):
         if self.currentTime <= 0:
@@ -50,17 +52,20 @@ class MarioEnv(gym.Env, object):
         state = self.get_state()
 
         # 보상 계산 (단순한 예시)
-        reward = self.calculate_reward()
+        #reward = self.calculate_reward()
 
         # 게임 종료 여부
         done = self.is_done()
+
+        if done:
+            self.reward = self.get_reward()
 
         # 게임이 종료되었지만 더는 상태가 없음
         #truncated = False
 
         if self.core.get_time() <= 0:
             done = True
-            reward -= 10
+            self.reward -= 10
             #truncated = True
             print("time up")
 
@@ -68,7 +73,7 @@ class MarioEnv(gym.Env, object):
         info = {}
         self.currentTime = self.currentTime - 1
 
-        return state, reward, done, info
+        return state, self.reward, done, info
 
     def calculate_reward(self):
         reward = 0
@@ -76,8 +81,19 @@ class MarioEnv(gym.Env, object):
             reward += 1  # 생존 보상
         return reward
 
+    def set_reward(self, score):
+        self.score = score
+
+    def get_reward(self):
+        return self.score
+
     def is_done(self):
+        if self.core.get_map().get_event().game_over:
+            print("player dead")
+            self.set_reward(-10)
+            return True
         if self.has_reached_flag():
+            self.set_reward(50)
             return True
         return self.core.get_mm().currentGameState != 'Game'
 
@@ -99,9 +115,9 @@ class MarioEnv(gym.Env, object):
 
     def reset(self):
         print("reset")
-        self.core.restart_game()
         self.last_input_time = 0
         self.input_cooldown = 200
+        self.core.restart_game()
         return self.get_state()
 
     def get_state(self):

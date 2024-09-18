@@ -136,6 +136,9 @@ class Core(object):
             self.keyU = True
 
     def reached_flag(self):
+        return self.is_flag
+
+    def set_flag_true(self):
         self.is_flag = True
 
     def get_time(self):
