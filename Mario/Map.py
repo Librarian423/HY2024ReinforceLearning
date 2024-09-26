@@ -1,19 +1,15 @@
 import pygame as pg
 from pytmx.util_pygame import load_pygame
 from GameUI import GameUI
-
 from Event import Event
-
 from Const import *
 from Platform import Platform
-
 from Camera import Camera
 from Player import Player
 from Mob import Mob
 from MenuManager import MenuManager
 from Tube import Tube
 from Flag import Flag
-
 from BGObject import BGObject
 
 class Map(object):
@@ -120,8 +116,20 @@ class Map(object):
     def get_player(self):
         return self.oPlayer
 
+    def get_is_player_dead(self):
+        return self.oPlayer.get_isdead()
+
     def get_mobs(self):
         return self.mobs
+
+    def get_mobs_xPos(self):
+        mobs_pos = []
+        for mob in self.mobs:
+            if not mob.dead:
+                mobs_pos.append(mob.pos_x)
+        if len(mobs_pos) <= 0:
+            return None
+        return mobs_pos
 
     def get_Camera(self):
         return self.oCamera
@@ -197,7 +205,6 @@ class Map(object):
             mob.update(core)
 
     def update(self, core):
-
         if not self.in_event:
             self.update_player(core)
             self.update_mobs(core)
@@ -206,9 +213,7 @@ class Map(object):
         else:
             print("map in event")
             self.get_event().update(core)
-
-
-
+        #update time ui
         self.update_time(core)
 
     def update_time(self, core):
@@ -223,10 +228,6 @@ class Map(object):
                 self.tick = 0
             # if self.time == 100 and self.tick == 1:
             #     core.get_sound().start_fast_music(core)
-
-
-
-
 
     def render_map(self, core):
         """

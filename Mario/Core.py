@@ -50,7 +50,7 @@ class Core(object):
         #if press 0 reset
         k = pg.key.get_pressed()
         if self.get_mm().currentGameState == 'Game':
-            #reset
+            #test reset input key_0
             if k[K_0]:
                 print("reset")
                 self.__init__()
@@ -101,11 +101,17 @@ class Core(object):
     def get_mm(self):
         return self.oMM
 
+    def get_is_player_dead(self):
+        return self.oWorld.get_is_player_dead()
+
+    def get_score(self):
+        return self.oWorld.get_player().get_score()
+
     def restart_game(self):
         self.__init__()
 
     def move_left(self):
-        #left
+        #run left
         self.keyShift = True
         self.keyL = True
         self.keyR = False
@@ -113,7 +119,7 @@ class Core(object):
         self.keyD = False
 
     def move_right(self):
-        #right
+        #run right
         self.keyShift = True
         self.keyL = False
         self.keyR = True
@@ -124,16 +130,32 @@ class Core(object):
         self.keyD = True
     def jump(self):
         #jump
-        if self.keyL == True:
-            self.keyShift = True
-            self.keyR = False
-            self.keyD = False
-            self.keyU = True
-        elif self.keyR == True:
-            self.keyShift = True
-            self.keyL = False
-            self.keyD = False
-            self.keyU = True
+        print("jump")
+        self.keyShift = True
+        self.keyL = False
+        self.keyR = False
+        self.keyD = False
+        self.keyU = True
+
+    def jump_left(self):
+        #jump left
+        print("jump left")
+        self.keyShift = True
+        self.keyL = True
+        self.keyR = False
+        self.keyD = False
+        self.keyU = True
+
+    def jump_right(self):
+        #jump right
+        print("jump right")
+        self.keyShift = True
+        self.keyL = False
+        self.keyR = True
+        self.keyD = False
+        self.keyU = True
+
+
 
     def reached_flag(self):
         return self.is_flag

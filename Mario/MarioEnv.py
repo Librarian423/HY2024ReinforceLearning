@@ -8,6 +8,7 @@ import time
 import pygame as pg
 from Const import *
 from gym.core import RenderFrame
+from enum import Enum
 
 from Player import Player
 import gym
@@ -18,7 +19,14 @@ from pygame.locals import *
 from Core import Core
 
 
-Mario_LEN_GOAL = 30
+#Mario_LEN_GOAL = 30
+
+class MOVES(Enum):
+    RIGHT = 0
+    LEFT = 1
+    JUMP = 2
+    JUMP_LEFT = 3
+    JUMP_RIGHT = 4
 
 class MarioEnv(gym.Env, object):
     reward = 0
@@ -30,7 +38,7 @@ class MarioEnv(gym.Env, object):
         # Define action and observation space
         # They must be gym.spaces objects
         # Example when using discrete actions:
-        self.action_space = spaces.Discrete(4)
+        self.action_space = spaces.Discrete(5)
         # Example for using image as input (channel-first; channel-last also works):
         self.observation_space = spaces.Box(low=0, high=255,
                                             shape=(WINDOW_H, WINDOW_W, 3),
@@ -38,87 +46,91 @@ class MarioEnv(gym.Env, object):
         self.currentTime = 0
         self.input_cooldown = 200
         self.score = 0
-        self.reward = 0
-
-    def step(self, action):
-        if self.currentTime <= 0:
-            self.handle_action(action)
-            self.currentTime = self.input_cooldown
-
-        # 게임 상태 업데이트
-        self.core.update()
-
-        # 상태 관찰
-        state = self.get_state()
-
-        # 보상 계산 (단순한 예시)
-        #reward = self.calculate_reward()
-
-        # 게임 종료 여부
-        done = self.is_done()
-
-        if done:
-            self.reward = self.get_reward()
-
-        # 게임이 종료되었지만 더는 상태가 없음
-        #truncated = False
-
-        if self.core.get_time() <= 0:
-            done = True
-            self.reward -= 10
-            #truncated = True
-            print("time up")
-
-        # 추가 정보
-        info = {}
-        self.currentTime = self.currentTime - 1
-
-        return state, self.reward, done, info
-
-    def calculate_reward(self):
-        reward = 0
-        if self.core.get_mm().currentGameState == 'Game':
-            reward += 1  # 생존 보상
-        return reward
-
-    def set_reward(self, score):
-        self.score = score
-
-    def get_reward(self):
-        return self.score
-
-    def is_done(self):
-        if self.core.get_map().get_event().game_over:
-            print("player dead")
-            self.set_reward(-10)
-            return True
-        if self.has_reached_flag():
-            self.set_reward(50)
-            return True
-        return self.core.get_mm().currentGameState != 'Game'
-
-
-    def handle_action(self, action):
-        #print("action", action)
-        # 액션에 따라 키 입력을 설정
-        if action == 0:  # 정지
-            pass
-            # self.core.keyR = False
-            # self.core.keyL = False
-            # self.core.keyU = False
-        elif action == 1:  # 왼쪽 이동
-            self.core.move_left()
-        elif action == 2:  # 오른쪽 이동
-            self.core.move_right()
-        elif action == 3:  # 점프
-            self.core.jump()
+        self.direction = MOVES.RIGHT
 
     def reset(self):
         print("reset")
+        self.direction = MOVES.RIGHT
         self.last_input_time = 0
+        self.currentTime = 0
         self.input_cooldown = 200
+        self.reward = 0
+        self.score = 0
         self.core.restart_game()
-        return self.get_state()
+
+    def step(self, action):
+        #1. user input
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                pg.quit()
+                quit()
+
+        # 2. move
+        #input delay
+        if self.currentTime <= 0:
+            self.handle_action(action)
+            self.currentTime = self.input_cooldown
+        #input delay cooldown
+        self.currentTime = self.currentTime - 1
+
+        #game update
+        self.core.update()
+
+
+        #3. check is game over
+        done = False
+
+        reward = 0
+
+        #player dead or time up
+        if self.player_fails() or self.core.get_time() <= 0:
+            reward -= 10
+            done = True
+            self.score = self.core.get_score()
+            return reward, done, self.score
+        #game clear
+        if self.player_clear():
+            done = True
+            reward += 10
+            self.score = self.core.get_score()
+            return reward, done, self.score
+
+        #4. return
+        return reward, done, self.score
+
+    # def calculate_reward(self):
+    #     reward = 0
+    #     if self.core.get_mm().currentGameState == 'Game':
+    #         reward += 1  # 생존 보상
+    #     return reward
+
+    # def set_reward(self, score):
+    #     self.score = score
+
+    def player_fails(self):
+        if self.core.get_map().get_event().game_over:
+            print("player dead")
+            #self.set_reward(-100)
+            return True
+        return False
+
+    def player_clear(self):
+        if self.has_reached_flag():
+            return True
+        return False
+
+    def handle_action(self, action):
+        if action == 0:
+            self.core.move_right()
+        elif action == 1:
+            self.core.move_left()
+        elif action == 2:  # 점프
+            self.core.jump()
+        elif action == 3:
+            self.core.jump_left()
+        elif action == 4:
+            self.core.jump_right()
+
 
     def get_state(self):
         state = pg.surfarray.array3d(self.core.screen)

@@ -26,7 +26,7 @@ model = PPO('MlpPolicy', env, verbose=1, tensorboard_log=logdir)
 
 # 모델 학습 및 저장
 TIMESTEPS = 10000
-for i in range(1, 30):
+for i in range(1, 10):
     model.learn(total_timesteps=TIMESTEPS, reset_num_timesteps=False, tb_log_name="PPO")
     print(i)
     model.save(f"{models_dir}/{TIMESTEPS * i}")

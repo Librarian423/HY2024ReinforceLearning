@@ -41,6 +41,8 @@ class Player(object):
         self.rect = pg.Rect(x_pos, y_pos, 32, 32)
         self.groundRect = pg.Rect(x_pos+8, y_pos+28, 16, 4)
         self.hitBlockRect = pg.Rect(x_pos, y_pos, 25, 5)
+
+        self.isdead = False
     def get_score(self):
         return self.score
 
@@ -96,6 +98,7 @@ class Player(object):
     def die(self, core):
         self.numOfLives -= 1
         core.get_map().get_event().start_kill(core, not self.numOfLives)
+        self.isdead = True
 
     def player_physics(self, core):
         if core.keyR:
@@ -244,6 +247,7 @@ class Player(object):
         # WINDOW_H???
         if self.rect.bottom > WINDOW_H:
             self.die(core)
+            print(self.pos_x, self.pos_y)
             return
 
         self.on_ground = False
@@ -293,33 +297,12 @@ class Player(object):
         #print("y rect " + str(self.rect.y))
 
     def check_upper_block(self, xCord, yCord,  character, core):
-
-        # x_temp = character.x // 32
-        # #x_temp = int(tc.clamp(x_temp, min=x_temp-0.5, max=x_temp+0.5))
-        # y_temp = character.y // 32
-        # print(x_temp, y_temp)
-        # print("block id",core.get_map().get_block_id(x_temp, y_temp))
+        #check the block id is 22 or 23
         if core.get_map().get_block_id(xCord, yCord) == 22:
             core.get_map().set_block_shake(xCord, yCord)
-            #print("hit")
-        # elif core.get_map().get_block_id(x_temp+1, y_temp) == 22:
-        #     core.get_map().set_block_shake(x_temp+1, y_temp)
-        #     print("hit")
-        # elif core.get_map().get_block_id(x_temp-1, y_temp) == 22:
-        #     core.get_map().set_block_shake(x_temp-1, y_temp)
-        #     print("hit")
 
         if core.get_map().get_block_id(xCord, yCord) == 23:
-            #print("shake")
             core.get_map().set_block_shake(xCord, yCord)
-            #print("hit")
-        # elif core.get_map().get_block_id(x_temp+1, y_temp) == 23:
-        #     core.get_map().set_block_shake(x_temp+1, y_temp)
-        #     print("hit")
-        # elif core.get_map().get_block_id(x_temp-1, y_temp) == 23:
-        #     core.get_map().set_block_shake(x_temp-1, y_temp)
-        #     print("hit")
-
 
 
     def activate_block_action(self, core, block):
@@ -387,3 +370,9 @@ class Player(object):
         flag_x_position = 6341.25  # 깃대의 x 좌표 예시
         if flag_x_position <= self.pos_x:
             core.set_flag_true()
+
+    def get_isdead(self):
+        return self.isdead
+
+    def get_score(self):
+        return self.score

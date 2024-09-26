@@ -12,10 +12,13 @@ for episode in range(episodes):
 	while not done:
 		random_action = env.action_space.sample()
 		#print("action",random_action)
-		obs, reward, done, info = env.step(random_action)
+		reward, done, score = env.step(random_action)
 		env.render()
-	print('check reward', reward)
-	print(episode)
+
+	print(episode, 'attempt')
+	print('reward: ', reward)
+	print('score: ', score)
+
 
 # It will check your custom environment and output additional warnings if needed
 #check_env(env)
