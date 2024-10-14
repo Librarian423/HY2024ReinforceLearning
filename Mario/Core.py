@@ -2,11 +2,10 @@ from os import environ
 
 import pygame as pg
 from pygame.locals import *
-
+from enum import Enum
 from Const import *
 from Map import Map
 from MenuManager import MenuManager
-
 
 class Core(object):
     """
@@ -46,15 +45,19 @@ class Core(object):
 
     def input(self):
         # if press 0 reset
-        k = pg.key.get_pressed()
+        # k = pg.key.get_pressed()
+
         if self.get_mm().currentGameState == 'Game':
             # test reset input key_0
-            if k[K_0]:
-                self.__init__()
-            if k[K_d]:
-                self.move_right()
-            elif k[K_w]:
-                self.jump_right()
+            # if k[K_0]:
+            #     self.__init__()
+            # if k[K_d]:
+            #     print('r')
+            #     self.move_right()
+            # elif k[K_a]:
+            #     self.move_left()
+            # elif k[K_w]:
+            #     self.jump()
             #reset up key when player on groun
             if (self.get_map().get_player().on_ground and
                     self.get_map().get_player().already_jumped):
@@ -64,28 +67,30 @@ class Core(object):
 
     def input_player(self):
         for e in pg.event.get():
-            if e.type == KEYDOWN:
-                if e.key == K_RIGHT:
+            print(e)
+            if e.type == pg.KEYDOWN:
+                print('down')
+                if e.key == pg.K_RIGHT:
                     self.keyR = True
-                elif e.key == K_LEFT:
+                elif e.key == pg.K_LEFT:
                     self.keyL = True
-                elif e.key == K_DOWN:
+                elif e.key == pg.K_DOWN:
                     self.keyD = True
-                elif e.key == K_UP:
+                elif e.key == pg.K_UP:
                     self.keyU = True
-                elif e.key == K_LSHIFT:
+                elif e.key == pg.K_LSHIFT:
                     self.keyShift = True
 
-            elif e.type == KEYUP:
-                if e.key == K_RIGHT:
+            elif e.type == pg.KEYUP:
+                if e.key == pg.K_RIGHT:
                     self.keyR = False
-                elif e.key == K_LEFT:
+                elif e.key == pg.K_LEFT:
                     self.keyL = False
-                elif e.key == K_DOWN:
+                elif e.key == pg.K_DOWN:
                     self.keyD = False
-                elif e.key == K_UP:
+                elif e.key == pg.K_UP:
                     self.keyU = False
-                elif e.key == K_LSHIFT:
+                elif e.key == pg.K_LSHIFT:
                     self.keyShift = False
 
     def update(self):
@@ -112,26 +117,26 @@ class Core(object):
         self.__init__()
 
     def stop(self):
-        # self.keyShift = False
-        self.keyL = False
         self.keyR = False
+        self.keyL = False
         self.keyU = False
         self.keyD = False
+        self.keyShift = False
 
     def move_left(self):
         # run left
-        # self.keyShift = True
+        self.keyShift = True
         self.keyL = True
         self.keyR = False
         self.keyU = False
         self.keyD = False
 
+
     def move_right(self):
         # run right
-        # self.keyShift = True
+        self.keyShift = True
         self.keyL = False
         self.keyR = True
-        self.keyU = False
         self.keyD = False
 
     def move_down(self):
@@ -140,20 +145,21 @@ class Core(object):
 
     def jump(self):
         # jump
-        # self.keyShift = True
+        self.keyShift = True
         self.keyL = False
         self.keyR = False
         self.keyD = False
         self.keyU = True
 
+
     def jump_left(self):
         # jump left
-        # print("jump left")
-        # self.keyShift = True
+        self.keyShift = True
         self.keyL = True
         self.keyR = False
         self.keyD = False
         self.keyU = True
+
 
     def jump_right(self):
         # jump right
