@@ -104,9 +104,9 @@ class Map(object):
         #self.spawn_flag(1, 1.5)
         self.spawn_flag(198.25,1.5)
         self.spawn_tube(28, 10)
-        self.spawn_tube(37, 9)
-        self.spawn_tube(46, 8)
-        self.spawn_tube(55, 8)
+        self.spawn_tube(37, 9)#9
+        self.spawn_tube(46, 9)#8
+        self.spawn_tube(55, 9)#8
         self.spawn_tube(163, 10)
         self.spawn_tube(179, 10)
         self.spawn_mob(900, 351, 'goombas')
@@ -155,7 +155,7 @@ class Map(object):
 
         for y in range(y_coord, 12):  # 12 is because it ground level
             for x in range(x_coord, x_coord + 2):
-                self.map[x][y] = Platform(x * 32, y * 32, image=None, type_id=0)
+                self.map[x][y] = Platform(x * 32, y * 32, image=None, type_id=100)
 
     def spawn_mob(self, x_pos, y_pos, name):
         index = len(self.mobs)
@@ -197,6 +197,51 @@ class Map(object):
             self.map[x + 1][y + 1]
         )
 
+    def get_rect_block(self, x, y):
+        if self.map[x][y] != 0 and self.map[x][y].type != 'BGObject':
+            return (self.map[x][y]).get_id()
+        return 0
+
+    def get_near_blocks(self):
+        player_x_cord = self.get_player().rect.x // 32
+        player_y_cord = self.get_player().rect.y // 32
+
+        # check player 4-dir blocks
+        # right block
+        right_block = self.get_rect_block(player_x_cord + 2, player_y_cord)
+        #left block
+        left_block = self.get_rect_block(player_x_cord - 1, player_y_cord)
+        #upper block
+        upper_block = self.get_rect_block(player_x_cord, player_y_cord - 1)
+        #upper right block
+        upper_r_block = self.get_rect_block(player_x_cord + 2, player_y_cord - 1)
+        # #down block
+        # down_block = self.get_rect_block(player_x_cord, player_y_cord + 1)
+        if right_block > 0:
+            right_block = 1
+        else:
+            right_block = 0
+
+        if left_block > 0:
+            left_block = 1
+        else:
+            left_block = 0
+
+        if upper_block > 0:
+            upper_block = 1
+        else:
+            upper_block = 0
+
+        if upper_r_block > 0:
+            upper_r_block = 1
+        else: upper_r_block = 0
+
+        blocks = [right_block, left_block, upper_block, upper_r_block]
+        return blocks
+
+    def get_block_height(self):
+
+        return 0
     def update_player(self, core):
         self.get_player().update(core)
 
@@ -215,6 +260,8 @@ class Map(object):
             self.get_event().update(core)
         #update time ui
         self.update_time(core)
+        #self.get_near_blocks()
+
 
     def update_time(self, core):
         """
@@ -230,11 +277,7 @@ class Map(object):
             #     core.get_sound().start_fast_music(core)
 
     def render_map(self, core):
-        """
 
-        Rendering only tiles. It's used in main menu.
-
-        """
         core.screen.blit(self.sky, (0, 0))
 
         for obj_group in (self.obj_bg, self.obj):
@@ -248,11 +291,7 @@ class Map(object):
             flag.render(core)
 
     def render(self, core):
-        """
 
-        Renders every object.
-
-        """
         core.screen.blit(self.sky, (0, 0))
 
         for obj in self.obj_bg:
