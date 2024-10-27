@@ -11,7 +11,7 @@ from Helper import plot
 
 
 MAX_MEMORY = 100_000
-BATCH_SIZE = 1000
+BATCH_SIZE = 500
 LR = 0.001      #learning rate
 
 class Agent:
@@ -21,7 +21,7 @@ class Agent:
         self.epsilon = 0 #randomness
         self.gamma = 0.9 #discount rate #must be smaller than 1
         self.memory = deque(maxlen=MAX_MEMORY) #popleft
-        self.model = Linear_QNet(9, 256, 5)
+        self.model = Linear_QNet(9, 256, 4)
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
 
     def get_state(self, game):
@@ -99,14 +99,13 @@ class Agent:
 
     def get_action(self, state):
         # random moves
-        #self.epsilon = 80 - self.num_games
         self.epsilon = max(0.01, 80 - self.num_games)
-        final_move = [0, 1, 2, 3, 4]
+        final_move = [0, 1, 2, 3]#, 4]
         action_num = 0
 
         # init value
         if random.randint(0, 200) < self.epsilon:
-            move = random.randint(1, 4)
+            move = random.randint(0, 3)
             action_num = final_move[move]
         else:
             # tensor

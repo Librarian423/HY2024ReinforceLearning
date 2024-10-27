@@ -51,9 +51,7 @@ class Player(object):
         self.hitBlockRect.y = self.rect.y
         self.hitBlockRect.x += 5
         self.hitBlockRect.y -= 1
-        # print("x hit " + str(self.hitBlockRect.x))
-        # print("y hit " + str(self.hitBlockRect.y))
-        # print("\n---------------------------\n")
+
     def load_sprites(self):
         self.sprites = [
             # 0 Small, stay
@@ -292,10 +290,6 @@ class Player(object):
                 else:
                     mob.get_weaponized(self.x_vel)
 
-        #self.hitBlockRect.y = self.rect.y
-
-        #print("y rect " + str(self.rect.y))
-
     def check_upper_block(self, xCord, yCord,  character, core):
         #check the block id is 22 or 23
         if core.get_map().get_block_id(xCord, yCord) == 22:
@@ -361,13 +355,10 @@ class Player(object):
                 self.set_image(4)
 
     def render(self, core):
-        #pg.draw.rect(core.screen, (255, 255, 255), self.hitBlockRect)
-        if self.visible:
-            core.screen.blit(self.image, core.get_map().get_Camera().apply(self))
+        core.screen.blit(self.image, core.get_map().get_Camera().apply(self))
 
     def has_reached_flag(self, core):
-        # 깃대에 도달했는지 확인하는 로직을 구현
-        flag_x_position = 6341.25  # 깃대의 x 좌표 예시
+        flag_x_position = 6341.25  #flag x pos
         if flag_x_position <= self.pos_x:
             core.set_flag_true()
 

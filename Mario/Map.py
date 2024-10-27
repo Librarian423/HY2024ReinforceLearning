@@ -260,7 +260,6 @@ class Map(object):
             self.get_event().update(core)
         #update time ui
         self.update_time(core)
-        #self.get_near_blocks()
 
 
     def update_time(self, core):
