@@ -1,21 +1,16 @@
 import pygame as pg
 from pytmx.util_pygame import load_pygame
-
 from GameUI import GameUI
-
 from Event import Event
-
 from Const import *
 from Platform import Platform
-
 from Camera import Camera
 from Player import Player
 from Mob import Mob
-
+from MenuManager import MenuManager
 from Tube import Tube
-
+from Flag import Flag
 from BGObject import BGObject
-
 
 class Map(object):
     """
@@ -28,7 +23,8 @@ class Map(object):
     def __init__(self, world_num):
         self.obj = [] #Foreground objects
         self.obj_bg = [] #Background objects
-        
+
+        self.flags = []
         self.tubes = []
 
         self.debris = []
@@ -36,7 +32,7 @@ class Map(object):
         self.projectiles = []
         self.text_objects = []
         self.map = 0
-        self.flag = None
+        #self.flag = None
 
         self.mapSize = (0, 0) #width, height
         self.sky = 0          #surface
@@ -45,7 +41,7 @@ class Map(object):
         self.worldNum = world_num
         self.loadWorld()
 
-        self.is_mob_spawned = [False, False]
+        # self.is_mob_spawned = [False, False]
         self.score_for_killing_mob = 100
         self.score_time = 0
 
@@ -58,6 +54,10 @@ class Map(object):
         self.oCamera = Camera(self.mapSize[0] * 32, 14)
 
         self.oPlayer = Player(x_pos=128, y_pos=351)
+        self.oGameUI = GameUI()
+
+    def get_time(self):
+        return (self.time)
 
     def loadWorld(self):
         tmx_data = load_pygame("Assets/worlds/tmx/W11.tmx")
@@ -101,32 +101,65 @@ class Map(object):
             layer_num += 1
 
         # tubes collection
+        #self.spawn_flag(1, 1.5)
+        self.spawn_flag(198.25,1.5)
         self.spawn_tube(28, 10)
-        self.spawn_tube(37, 9)
-        self.spawn_tube(46, 8)
-        self.spawn_tube(55, 8)
+        self.spawn_tube(37, 9)#9
+        self.spawn_tube(46, 9)#8
+        self.spawn_tube(55, 9)#8
         self.spawn_tube(163, 10)
         self.spawn_tube(179, 10)
-        self.spawn_mob(0, 351, 'goombas')
-        self.spawn_mob(188, 351, 'goombas')
+        self.spawn_mob(900, 351, 'goombas')
+        self.spawn_mob(700, 351, 'goombas')
+        self.spawn_mob(230, 351, 'koopa')
 
     def get_player(self):
         return self.oPlayer
 
+    def get_is_player_dead(self):
+        return self.oPlayer.get_isdead()
+
+    def get_mobs(self):
+        return self.mobs
+
+    def get_mobs_xPos(self):
+        mobs_pos = []
+        for mob in self.mobs:
+            if not mob.dead:
+                mobs_pos.append(mob.pos_x)
+        if len(mobs_pos) <= 0:
+            return None
+        return mobs_pos
+
     def get_Camera(self):
         return self.oCamera
+
+    def get_name(self):
+        if self.worldNum == '1-1':
+            return '1-1'
+
+    def get_ui(self):
+        return self.oGameUI
+
+    def spawn_flag(self, x_coord, y_coord):
+        self.flags.append(Flag(x_coord, y_coord))
+
+    def get_event(self):
+        return self.oEvent
+
+    def set_event(self):
+        self.in_event = True
 
     def spawn_tube(self, x_coord, y_coord):
         self.tubes.append(Tube(x_coord, y_coord))
 
         for y in range(y_coord, 12):  # 12 is because it ground level
             for x in range(x_coord, x_coord + 2):
-                self.map[x][y] = Platform(x * 32, y * 32, image=None, type_id=0)
+                self.map[x][y] = Platform(x * 32, y * 32, image=None, type_id=100)
 
     def spawn_mob(self, x_pos, y_pos, name):
         index = len(self.mobs)
         self.mobs.append(Mob(x_pos, y_pos, name, index))
-        # self.is_mob_spawned[0] = True
 
     # Returns tiles around the entity
     def get_blocks_for_collision(self, x, y):
@@ -164,6 +197,51 @@ class Map(object):
             self.map[x + 1][y + 1]
         )
 
+    def get_rect_block(self, x, y):
+        if self.map[x][y] != 0 and self.map[x][y].type != 'BGObject':
+            return (self.map[x][y]).get_id()
+        return 0
+
+    def get_near_blocks(self):
+        player_x_cord = self.get_player().rect.x // 32
+        player_y_cord = self.get_player().rect.y // 32
+
+        # check player 4-dir blocks
+        # right block
+        right_block = self.get_rect_block(player_x_cord + 2, player_y_cord)
+        #left block
+        left_block = self.get_rect_block(player_x_cord - 1, player_y_cord)
+        #upper block
+        upper_block = self.get_rect_block(player_x_cord, player_y_cord - 1)
+        #upper right block
+        upper_r_block = self.get_rect_block(player_x_cord + 2, player_y_cord - 1)
+        # #down block
+        # down_block = self.get_rect_block(player_x_cord, player_y_cord + 1)
+        if right_block > 0:
+            right_block = 1
+        else:
+            right_block = 0
+
+        if left_block > 0:
+            left_block = 1
+        else:
+            left_block = 0
+
+        if upper_block > 0:
+            upper_block = 1
+        else:
+            upper_block = 0
+
+        if upper_r_block > 0:
+            upper_r_block = 1
+        else: upper_r_block = 0
+
+        blocks = [right_block, left_block, upper_block, upper_r_block]
+        return blocks
+
+    def get_block_height(self):
+
+        return 0
     def update_player(self, core):
         self.get_player().update(core)
 
@@ -172,24 +250,33 @@ class Map(object):
             mob.update(core)
 
     def update(self, core):
-
-        if not core.get_map().in_event:
+        if not self.in_event:
             self.update_player(core)
             self.update_mobs(core)
-
-        else:
-            self.get_event().update(core)
-
-        # this is code to make move for the camera
-        if not self.in_event:
+            # this is code to make move for the camera
             self.get_Camera().update(core.get_map().get_player().rect)
+        else:
+            print("map in event")
+            self.get_event().update(core)
+        #update time ui
+        self.update_time(core)
+
+
+    def update_time(self, core):
+        """
+        Updating a map time.
+        """
+        # Time updates only if map not in event
+        if not self.in_event:
+            self.tick += 1
+            if self.tick % 40 == 0:
+                self.time -= 1
+                self.tick = 0
+            # if self.time == 100 and self.tick == 1:
+            #     core.get_sound().start_fast_music(core)
 
     def render_map(self, core):
-        """
 
-        Rendering only tiles. It's used in main menu.
-
-        """
         core.screen.blit(self.sky, (0, 0))
 
         for obj_group in (self.obj_bg, self.obj):
@@ -199,12 +286,11 @@ class Map(object):
         for tube in self.tubes:
             tube.render(core)
 
+        for flag in self.flags:
+            flag.render(core)
+
     def render(self, core):
-        """
 
-        Renders every object.
-
-        """
         core.screen.blit(self.sky, (0, 0))
 
         for obj in self.obj_bg:
@@ -212,6 +298,9 @@ class Map(object):
 
         for tube in self.tubes:
             tube.render(core)
+
+        for flag in self.flags:
+            flag.render(core)
 
         for obj in self.obj:
             obj.render(core)  # bricks
@@ -221,29 +310,4 @@ class Map(object):
 
         self.get_player().render(core)  # player
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        self.get_ui().render(core) #UI

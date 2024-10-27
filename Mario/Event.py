@@ -5,22 +5,30 @@ from Const import *
 #UPDATE CHECK KILL 
 class Event(object):
     def __init__(self):
-        pass
+        self.x_vel = 0
+        self.y_vel = 0
+        self.killed = False  # killed or win
+        self.game_over = False
 
-       
 
     def reset(self):
-        pass
+        self.x_vel = 0
+        self.y_vel = 0
+        self.killed = False  # killed or win
+        self.game_over = False
        
 
     def start_kill(self, core, game_over):
-        """
+        core.get_map().set_event()
+        self.killed = True
 
-        Player gets killed.
+        player = core.get_map().get_player()
+        player.set_image(-1)
+        self.y_vel = -4.0
 
-        """
-        pass
-       
+        self.game_over = True#game_over
+
+
 
     def start_win(self, core):
         """
@@ -31,11 +39,12 @@ class Event(object):
         pass
        
     def update(self, core):
-        pass
-        
-
-
-
+        player = core.get_map().get_player()
+        if self.killed:
+            self.y_vel += GRAVITY * FALL_MULTIPLIER if self.y_vel < 6 else 0
+            core.get_map().get_player().rect.y += self.y_vel
+            if player.rect.y == WINDOW_H:
+                self.y_vel = 0
 
 
 

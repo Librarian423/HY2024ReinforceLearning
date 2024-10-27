@@ -1,6 +1,5 @@
 import pygame as pg
 
-
 class Platform(object):
     def __init__(self, x, y, image, type_id):
         self.image = image
