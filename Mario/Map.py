@@ -7,6 +7,7 @@ from Platform import Platform
 from Camera import Camera
 from Player import Player
 from Mob import Mob
+from Item import *
 from MenuManager import MenuManager
 from Tube import Tube
 from Flag import Flag
@@ -29,6 +30,7 @@ class Map(object):
 
         self.debris = []
         self.mobs = []
+        self.items = []
         self.projectiles = []
         self.text_objects = []
         self.map = 0
@@ -94,6 +96,8 @@ class Map(object):
 
                             self.map[x][y] = Platform(x * tmx_data.tileheight, y * tmx_data.tilewidth, image, tileID)
                             self.obj.append(self.map[x][y])
+                            if tileID == 22:
+                                self.items.append(self.map[x][y].item)
 
                         if layer.name == 'Background':
                             self.map[x][y] = BGObject(x * tmx_data.tileheight, y * tmx_data.tilewidth, image)
@@ -131,6 +135,9 @@ class Map(object):
             return None
         return mobs_pos
 
+    def get_items(self):
+        return self.items
+
     def get_Camera(self):
         return self.oCamera
 
@@ -160,6 +167,15 @@ class Map(object):
     def spawn_mob(self, x_pos, y_pos, name):
         index = len(self.mobs)
         self.mobs.append(Mob(x_pos, y_pos, name, index))
+
+    def spawn_item(self, x_pos, y_pos, itemID):
+        if itemID == 0: # coin
+            self.items.append(Coin(x_pos, y_pos, 'coin'))
+        elif itemID == 1: # mushroom
+            self.items.append(Mushroom(x_pos, y_pos, 'mushroom'))
+        elif itemID == 2: # flower
+            self.items.append(Flower(x_pos, y_pos, 'flower'))
+
 
     # Returns tiles around the entity
     def get_blocks_for_collision(self, x, y):
@@ -240,8 +256,8 @@ class Map(object):
         return blocks
 
     def get_block_height(self):
-
         return 0
+
     def update_player(self, core):
         self.get_player().update(core)
 
@@ -249,10 +265,15 @@ class Map(object):
         for mob in self.mobs:
             mob.update(core)
 
+    def update_items(self, core):
+        for item in self.items:
+            item.update(core)
+
     def update(self, core):
         if not self.in_event:
             self.update_player(core)
             self.update_mobs(core)
+            self.update_items(core)
             # this is code to make move for the camera
             self.get_Camera().update(core.get_map().get_player().rect)
         else:
@@ -307,6 +328,9 @@ class Map(object):
 
         for mob in self.mobs:
             mob.render(core)
+
+        for item in self.items:
+            item.render(core)
 
         self.get_player().render(core)  # player
 

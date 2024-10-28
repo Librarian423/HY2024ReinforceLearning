@@ -1,5 +1,7 @@
 import pygame as pg
 
+from Item import *
+
 class Platform(object):
     def __init__(self, x, y, image, type_id):
         self.image = image
@@ -15,6 +17,7 @@ class Platform(object):
         self.shaking = False
         self.shakingUp = True
         self.shakeOffset = 0
+        self.item = None
 
         #?block
         if self.typeID == 22:
@@ -22,6 +25,8 @@ class Platform(object):
             self.imageTick = 0
             self.isActivated = False
             self.bonus = 'coin'
+            self.item = Coin(x + 8, y - 32, 'coin')
+
         #block
         if self.typeID == 23:
             self.currentImage = 0
@@ -65,6 +70,12 @@ class Platform(object):
 
     def set_isActivated(self):
         self.isActivated = True
+        if self.typeID == 22:
+            self.give_item()
+            self.currentImage = 3
+
+    def give_item(self):
+        self.item.activated = True
 
     def change_block_image(self):
         pass

@@ -151,6 +151,10 @@ class Core(object):
     #     self.keyR = True
     #     self.keyD = False
     #     self.keyU = True
+    #
+    # def move_down(self):
+    #     #down
+    #     self.keyD = True
 
     def reached_flag(self):
         return self.is_flag

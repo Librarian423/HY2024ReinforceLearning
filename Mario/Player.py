@@ -43,8 +43,6 @@ class Player(object):
         self.hitBlockRect = pg.Rect(x_pos, y_pos, 25, 5)
 
         self.isdead = False
-    def get_score(self):
-        return self.score
 
     def updateRectPos(self):
         self.hitBlockRect.x = self.rect.x
@@ -97,6 +95,12 @@ class Player(object):
         self.numOfLives -= 1
         core.get_map().get_event().start_kill(core, not self.numOfLives)
         self.isdead = True
+
+    def get_score(self):
+        return self.score
+
+    def add_score(self, by):
+        self.score += by
 
     def player_physics(self, core):
         if core.keyR:
@@ -171,17 +175,19 @@ class Player(object):
 
         blocks = core.get_map().get_blocks_for_collision(self.rect.x // 32, self.rect.y // 32)
         mobs = core.get_map().get_mobs()
+        items = core.get_map().get_items()
 
         self.pos_x += self.x_vel
         self.rect.x = self.pos_x
         self.groundRect.x = self.pos_x+6
 
         # this function allows to stop when player collides with bricks
-        self.update_x_pos(core, blocks, mobs)
+        self.update_x_pos(core, blocks, mobs, items)
 
         self.rect.y += self.y_vel
-        self.update_y_pos(blocks, mobs, core)
-        if core.get_map().get_event().killed:
+        # this function is check if player steps the mob collided
+        self.update_y_pos(core, blocks, mobs)
+        if core.get_map().get_event().game_over:
             return False
 
         # on_ground() parameter won't be stable without the following code:
@@ -199,8 +205,7 @@ class Player(object):
         return True
 
 
-
-    def update_x_pos(self, core, blocks, mobs):
+    def update_x_pos(self, core, blocks, mobs, items):
 
         if self.rect.left < 0:
             self.die(core)
@@ -225,22 +230,17 @@ class Player(object):
                         self.x_vel = 0
 
         for mob in mobs:
-            if mob.dead and mob.name != "koopa":
+            if mob.get_state() == DEAD or mob.get_state() == GONE:
                 continue
             if pg.Rect.colliderect(self.rect, mob.rect):
-                mob.collided = True
-                # if self.x_vel > 0:
-                #     self.rect.right = mob.rect.left
-                #     self.pos_x = self.rect.left
-                #     self.x_vel = 0
-                # elif self.x_vel < 0:
-                #     self.rect.left = mob.rect.right
-                #     self.pos_x = self.rect.left
-                #     self.x_vel = 0
+                mob.collide()
+
+        for item in items:
+            if pg.Rect.colliderect(self.rect, item.rect):
+                item.get_eaten()
 
 
-
-    def update_y_pos(self, blocks, mobs, core):
+    def update_y_pos(self, core, blocks, mobs):
 
         # WINDOW_H???
         if self.rect.bottom > WINDOW_H:
@@ -270,25 +270,28 @@ class Player(object):
                         self.y_vel = -self.y_vel / 3
 
         for mob in mobs:
-            if not mob.collided:
+            if not mob.is_collided(): # DEAD나 GONE은 이미 걸러짐
                 continue
-            mob.collided = False
-            if mob.weaponized:
+            mob.uncollide()
+            if mob.get_state() == WEAPON:  # dead koopa shell
                 self.die(core)
                 return
-            if self.y_vel > 0:
+
+            if self.y_vel > 0:  # 몹을 점프로 밟음
                 self.rect.bottom = mob.rect.top
                 self.y_vel = -self.y_vel
-                if not mob.dead:
+                self.already_jumped = True
+                self.next_jump_time = pg.time.get_ticks() + 750
+                if mob.get_state() == UNDEAD:
+                    mob.get_weaponized(self.x_vel)
+                else:
                     self.score += SCORES[mob.name]
                     mob.get_killed(0)
-                else:  # koopa
+            else:  # 몹을 밟지 못함
+                if mob.get_state() == UNDEAD:
                     mob.get_weaponized(self.x_vel)
-            else:
-                if not mob.dead:
-                    self.die(core)
                 else:
-                    mob.get_weaponized(self.x_vel)
+                    self.die(core)
 
     def check_upper_block(self, xCord, yCord,  character, core):
         #check the block id is 22 or 23
@@ -298,19 +301,19 @@ class Player(object):
         if core.get_map().get_block_id(xCord, yCord) == 23:
             core.get_map().set_block_shake(xCord, yCord)
 
-
     def activate_block_action(self, core, block):
         pass
 
     def set_image(self, image_id):
         if image_id == -1: # player dead
             self.image = self.sprites[len(self.sprites) - 1]
-            #return
+            return
 
         if self.direction:
             self.image = self.sprites[image_id % 8]
         else:
             self.image = self.sprites[(image_id % 8) + 8]
+
 
     def update_image(self, core):
 
@@ -332,7 +335,7 @@ class Player(object):
                     (self.x_vel < 0 and not (core.keyL or core.keyR))
             ):
 
-                if (self.spriteTick > 30):
+                if self.spriteTick > 30:
                     self.spriteTick = 0
 
                 if self.spriteTick <= 10:
@@ -364,6 +367,3 @@ class Player(object):
 
     def get_isdead(self):
         return self.isdead
-
-    def get_score(self):
-        return self.score

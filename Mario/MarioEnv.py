@@ -150,8 +150,9 @@ class MarioEnv(gym.Env, object):
                 elif e.key == pg.K_LSHIFT:
                     self.core.keyShift = False
 
-    def render(self, mode='human'):
-        #if self.render_on:
+
+    def render(self, mode='human'): # mode='human' 시 렌더링
+        # if self.render_on:
         self.core.render()
         pg.display.flip()
 
@@ -164,5 +165,3 @@ register(
     id='Mario-v0',                # Env ID
     entry_point='MarioEnv:MarioEnv', 
 )
-
-
