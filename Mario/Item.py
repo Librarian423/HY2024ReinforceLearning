@@ -2,8 +2,6 @@ import pygame as pg
 from Const import *
 
 
-
-
 class Item(object):
   def __init__(self, x_pos, y_pos, name):
     self.pos_x = x_pos
@@ -12,6 +10,7 @@ class Item(object):
     self.y_vel = 0
     self.on_ground = False
     self.activated = False
+    self.eaten = False
     self.image = None
 
   def render(self, core):
@@ -19,8 +18,8 @@ class Item(object):
       return
     core.screen.blit(self.image, core.get_map().get_Camera().apply(self))
 
-
-
+  def get_activated(self, core):
+    self.activated = True
 
 class Coin(Item):
   def __init__(self, x_pos, y_pos, name):
@@ -76,13 +75,14 @@ class Coin(Item):
       self.spriteTick = 0
       self.image = self.sprites[0]
 
+  def get_activated(self, core):
+    if not self.eaten:
+      self.eaten = True
+      core.get_map().get_player().incr_coin()
+    self.activated = True
+
   def get_eaten(self): # player gets point
     pass
-
-
-
-
-
 
 
 class Mushroom(Item):

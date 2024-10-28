@@ -102,6 +102,9 @@ class Player(object):
     def add_score(self, by):
         self.score += by
 
+    def incr_coin(self):
+        self.coins += 1
+
     def player_physics(self, core):
         if core.keyR:
             self.x_vel += SPEED_INCREASE_RATE
@@ -257,7 +260,7 @@ class Player(object):
                 if pg.Rect.colliderect(self.hitBlockRect, block.rect):
                     blockX = block.rect.left // 32
                     blockY = block.rect.top // 32
-                    self.check_upper_block(blockX, blockY,self.hitBlockRect, core)
+                    self.check_upper_block(blockX, blockY, core)
                 if pg.Rect.colliderect(self.rect, block.rect):
                     #self.check_upper_block(self.rect, core)
                     if self.y_vel > 0:
@@ -293,13 +296,13 @@ class Player(object):
                 else:
                     self.die(core)
 
-    def check_upper_block(self, xCord, yCord,  character, core):
+    def check_upper_block(self, xCord, yCord, core):
         #check the block id is 22 or 23
         if core.get_map().get_block_id(xCord, yCord) == 22:
-            core.get_map().set_block_shake(xCord, yCord)
+            core.get_map().set_block_shake(xCord, yCord, core)
 
         if core.get_map().get_block_id(xCord, yCord) == 23:
-            core.get_map().set_block_shake(xCord, yCord)
+            core.get_map().set_block_shake(xCord, yCord, core)
 
     def activate_block_action(self, core, block):
         pass

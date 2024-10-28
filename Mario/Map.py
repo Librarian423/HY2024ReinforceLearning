@@ -201,10 +201,10 @@ class Map(object):
         if self.map[x][y] != 0 and self.map[x][y].type != 'BGObject':
             return ((self.map[x][y]).get_id())
 
-    def set_block_shake(self, x, y):
+    def set_block_shake(self, x, y, core):
         if self.map[x][y] != 0 and self.map[x][y].type != 'BGObject':
             if (self.map[x][y]).get_id() == 22 or 23:
-                self.map[x][y].set_shake_true()
+                self.map[x][y].set_shake_true(core)
 
     def get_blocks_below(self, x, y):
         # return two blocks where player is standing

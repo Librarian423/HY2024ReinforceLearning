@@ -63,19 +63,15 @@ class Platform(object):
     def get_id(self):
         return (self.typeID)
 
-    def set_shake_true(self):
+    def set_shake_true(self, core):
         self.shaking = True
-        self.set_isActivated()
+        self.set_isActivated(core)
 
-
-    def set_isActivated(self):
+    def set_isActivated(self, core):
         self.isActivated = True
         if self.typeID == 22:
-            self.give_item()
+            self.item.get_activated(core)
             self.currentImage = 3
-
-    def give_item(self):
-        self.item.activated = True
 
     def change_block_image(self):
         pass
