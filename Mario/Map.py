@@ -129,7 +129,7 @@ class Map(object):
     def get_mobs_xPos(self):
         mobs_pos = []
         for mob in self.mobs:
-            if not mob.dead:
+            if not mob.state == DEAD:
                 mobs_pos.append(mob.pos_x)
         if len(mobs_pos) <= 0:
             return None
