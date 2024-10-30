@@ -51,9 +51,7 @@ class Core(object):
 
     def input_player(self):
         for e in pg.event.get():
-            print(e)
             if e.type == pg.KEYDOWN:
-                print('down')
                 if e.key == pg.K_RIGHT:
                     self.keyR = True
                 elif e.key == pg.K_LEFT:

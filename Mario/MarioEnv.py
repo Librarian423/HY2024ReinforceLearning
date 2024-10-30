@@ -82,7 +82,7 @@ class MarioEnv(gym.Env, object):
 
     def player_fails(self):
         if self.core.get_map().get_event().game_over:
-            print("player dead")
+            #print("player dead")
             return True
         return False
 
