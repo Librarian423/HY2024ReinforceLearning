@@ -1,7 +1,6 @@
 import pygame as pg
 from Const import *
-from pygame.locals import QUIT,Rect
-
+import ResourcePath
 
 
 class Player(object):
@@ -54,35 +53,35 @@ class Player(object):
         self.sprites = [
             # 0 Small, stay
             # 0 Small, stay
-            pg.image.load('Assets/images/Mario/mario.png'),
+            pg.image.load(ResourcePath.resource_path('Assets/images/Mario/mario.png')),
 
             # 1 Small, move 0
-            pg.image.load('Assets/images/Mario/mario_move0.png'),
+            pg.image.load(ResourcePath.resource_path('Assets/images/Mario/mario_move0.png')),
 
             # 2 Small, move 1
-            pg.image.load('Assets/images/Mario/mario_move1.png'),
+            pg.image.load(ResourcePath.resource_path('Assets/images/Mario/mario_move1.png')),
 
             # 3 Small, move 2
-            pg.image.load('Assets/images/Mario/mario_move2.png'),
+            pg.image.load(ResourcePath.resource_path('Assets/images/Mario/mario_move2.png')),
 
             # 4 Small, jump
-            pg.image.load('Assets/images/Mario/mario_jump.png'),
+            pg.image.load(ResourcePath.resource_path('Assets/images/Mario/mario_jump.png')),
 
             # 5 Small, end 0
-            pg.image.load('Assets/images/Mario/mario_end.png'),
+            pg.image.load(ResourcePath.resource_path('Assets/images/Mario/mario_end.png')),
 
             # 6 Small, end 1
-            pg.image.load('Assets/images/Mario/mario_end1.png'),
+            pg.image.load(ResourcePath.resource_path('Assets/images/Mario/mario_end1.png')),
 
             # 7 Small, stop
-            pg.image.load('Assets/images/Mario/mario_st.png')]
+            pg.image.load(ResourcePath.resource_path('Assets/images/Mario/mario_st.png'))]
 
         # Left side
         for i in range(len(self.sprites)):
             self.sprites.append(pg.transform.flip(self.sprites[i], 180, 0))
 
         # Dead(should always be at last)
-        self.sprites.append(pg.image.load('Assets/images/Mario/mario_death.png'))
+        self.sprites.append(pg.image.load(ResourcePath.resource_path('Assets/images/Mario/mario_death.png')))
 
 
     def update(self, core):
@@ -248,7 +247,6 @@ class Player(object):
         # WINDOW_H???
         if self.rect.bottom > WINDOW_H:
             self.die(core)
-            print(self.pos_x, self.pos_y)
             return
 
         self.on_ground = False

@@ -1,6 +1,7 @@
 import pygame as pg
 import math
 import random
+import ResourcePath
 
 from Const import *
 
@@ -13,10 +14,10 @@ class Mob(object):
         self.pos_x = x_pos
         if index % 2 :
             self.x_vel = -MOB_SLOW_SPEED
-            self.image = pg.image.load('Assets/images/' + self.name + '_0.png')
+            self.image = pg.image.load(ResourcePath.resource_path('Assets/images/' + self.name + '_0.png'))
         else :
             self.x_vel = MOB_SLOW_SPEED
-            self.image = pg.image.load('Assets/images/' + self.name + '_1.png')
+            self.image = pg.image.load(ResourcePath.resource_path('Assets/images/' + self.name + '_1.png'))
         self.y_vel = 0
         self.index = index
         self.on_ground = False
@@ -35,16 +36,16 @@ class Mob(object):
     def load_sprites(self):
         self.sprites = [
             # 0
-            pg.image.load('Assets/images/' + self.name + '_0.png'),
+            pg.image.load(ResourcePath.resource_path('Assets/images/' + self.name + '_0.png')),
 
             # 1
-            pg.image.load('Assets/images/' + self.name + '_1.png')]
+            pg.image.load(ResourcePath.resource_path('Assets/images/' + self.name + '_1.png'))]
 
         # Left side
         for i in range(len(self.sprites)):
             self.sprites.append(pg.transform.flip(self.sprites[i], 180, 0))
         # Dead
-        self.sprites.append(pg.image.load('Assets/images/' + self.name + '_dead.png'))
+        self.sprites.append(pg.image.load(ResourcePath.resource_path('Assets/images/' + self.name + '_dead.png')))
 
     def update(self, core):
         if self.state == GONE:

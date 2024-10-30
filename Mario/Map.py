@@ -2,16 +2,15 @@ import pygame as pg
 from pytmx.util_pygame import load_pygame
 from GameUI import GameUI
 from Event import Event
-from Const import *
 from Platform import Platform
 from Camera import Camera
 from Player import Player
 from Mob import Mob
 from Item import *
-from MenuManager import MenuManager
 from Tube import Tube
 from Flag import Flag
 from BGObject import BGObject
+import ResourcePath
 
 class Map(object):
     """
@@ -62,7 +61,8 @@ class Map(object):
         return (self.time)
 
     def loadWorld(self):
-        tmx_data = load_pygame("Assets/worlds/tmx/W11.tmx")
+        path = ResourcePath
+        tmx_data = load_pygame(path.tmx_path)
         self.mapSize = (tmx_data.width, tmx_data.height)
 
         self.sky = pg.Surface((WINDOW_W, WINDOW_H))
@@ -277,7 +277,6 @@ class Map(object):
             # this is code to make move for the camera
             self.get_Camera().update(core.get_map().get_player().rect)
         else:
-            print("map in event")
             self.get_event().update(core)
         #update time ui
         self.update_time(core)

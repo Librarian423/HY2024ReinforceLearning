@@ -1,10 +1,11 @@
 import pygame as pg
+import ResourcePath
 
 
 
 class GameUI(object):
     def __init__(self):
-        self.font = pg.font.Font('Assets/fonts/emulogic.ttf', 20)
+        self.font = pg.font.Font(ResourcePath.resource_path('Assets/fonts/emulogic.ttf'), 20)
         self.text = 'SCORE COINS WORLD TIME LIVES'
 
     def render(self, core):

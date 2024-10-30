@@ -1,11 +1,11 @@
 import pygame as pg
-
+import ResourcePath
 
 class Tube(pg.sprite.Sprite):
     def __init__(self, x_pos, y_pos):
         super().__init__()
 
-        self.image = pg.image.load('Assets/images/tube.png').convert_alpha()
+        self.image = pg.image.load(ResourcePath.resource_path('Assets/images/tube.png')).convert_alpha()
         length = (12 - y_pos) * 32
         self.image = self.image.subsurface(0, 0, 64, length)
 

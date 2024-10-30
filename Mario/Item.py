@@ -1,5 +1,6 @@
 import pygame as pg
 from Const import *
+import ResourcePath
 
 
 class Item(object):
@@ -24,7 +25,8 @@ class Item(object):
 class Coin(Item):
   def __init__(self, x_pos, y_pos, name):
     super().__init__(x_pos, y_pos, name)
-    self.image = pg.image.load('Assets/images/' + self.name + '_an0.png')
+    image_path = ResourcePath.resource_path('Assets/images/' + self.name + '_an0.png')
+    self.image = pg.image.load(image_path)
     width = self.image.get_width()
     height = self.image.get_height()
     self.rect = pg.Rect(x_pos, y_pos - (height - 32), width, height)
@@ -36,7 +38,8 @@ class Coin(Item):
 
   def load_sprites(self):
     for i in range(0, 4):
-      self.sprites.append(pg.image.load('Assets/images/' + self.name + '_an' + str(i) + '.png'))
+      image_path = ResourcePath.resource_path('Assets/images/' + self.name + '_an' + str(i) + '.png')
+      self.sprites.append(pg.image.load(image_path))
 
   def update(self, core): # no concern with block
     if not self.activated:
