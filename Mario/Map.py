@@ -61,8 +61,7 @@ class Map(object):
         return (self.time)
 
     def loadWorld(self):
-        path = ResourcePath
-        tmx_data = load_pygame(path.tmx_path)
+        tmx_data = load_pygame(ResourcePath.resource_path("Assets/worlds/tmx/W11.tmx"))
         self.mapSize = (tmx_data.width, tmx_data.height)
 
         self.sky = pg.Surface((WINDOW_W, WINDOW_H))
